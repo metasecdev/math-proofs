@@ -34,3 +34,8 @@ import Thoughts
 #print axioms FinitistProved.PiDigitStructure.forced_chain
 #print axioms FinitistProved.PiDigitStructure.piNeed_bounds
 #print axioms FinitistProved.PiDigitStructure.long_gap_short_run
+-- capped-certificate analysis: PBBP01General (capped) refuted; fast guard checker soundness
+#print axioms FinitistProved.chkFrom_sound
+#print axioms FinitistProved.not_PBBP01General
+#print axioms FinitistProved.not_BBPSpigotDigitCorrect_first
+#print axioms FinitistProved.cap_window_condition_sharp
