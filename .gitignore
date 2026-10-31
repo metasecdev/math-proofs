@@ -1,0 +1,27 @@
+# Lake build output and dependency checkouts
+/.lake/
+/build/
+/lake-packages/
+# Editor / OS noise
+.DS_Store
+._*
+*.olean
+*.ilean
+# Python
+__pycache__/
+*.pyc
+.venv*/
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.bbl
+*.blg
+# Never commit secrets
+.env
+*.pem
+*.key
