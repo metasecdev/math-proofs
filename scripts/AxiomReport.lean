@@ -30,3 +30,7 @@ import Thoughts
 #print axioms FinitistProved.bbp_digit_all_n_mu570b
 #print axioms FinitistProved.bbp_digit_all_n_fixed7b
 #print axioms FinitistProved.bbp_digit_all_n_at_G7b
+-- forced structure of π's hex digits (runs, gaps, distance, guard need)
+#print axioms FinitistProved.PiDigitStructure.forced_chain
+#print axioms FinitistProved.PiDigitStructure.piNeed_bounds
+#print axioms FinitistProved.PiDigitStructure.long_gap_short_run
