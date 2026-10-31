@@ -1,0 +1,44 @@
+name: Lean CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      # Installs elan + the pinned toolchain and fetches the prebuilt Mathlib cache.
+      # The build itself runs in the next step so its log can be audited.
+      - uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+          build: false
+          test: false
+          lint: false
+
+      - name: lake build
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee build.log
+
+      - name: Axiom report for key theorems
+        run: |
+          set -o pipefail
+          lake env lean scripts/AxiomReport.lean 2>&1 | tee axioms.log
+
+      - name: Axiom / sorry / native_decide gate
+        run: python3 scripts/check_axioms.py build.log axioms.log
