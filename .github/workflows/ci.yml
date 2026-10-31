@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "snapshot/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build default target (BBPPi)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      # Installs elan, restores the .lake cache, runs `lake exe cache get`
+      # (Mathlib oleans) and `lake build` of the default target only.
+      # The optional BBPPiCerts library is not built in CI.
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+          lint: false
+          use-mathlib-cache: true
+
+      - name: Source hygiene
+        run: bash scripts/check_hygiene.sh
+
+      - name: Axiom report
+        run: bash scripts/check_axioms.sh
+
+      - name: Upload axiom report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axioms-report
+          path: axioms-report.txt
+          if-no-files-found: warn
