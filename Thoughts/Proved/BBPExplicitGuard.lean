@@ -25,8 +25,9 @@
     constants (not in Mathlib; not attempted). Equivalently, `g(n)` is governed by the length of
     the run of hex `0`s / `F`s of π after position `n`.
   * Nothing about normality of π.
-  * `PBBP01General` (the capped statement `∀ n, bbp_hex_digit n = bbpHexDigitReal n`) is still
-    not proved (and not refuted); its route via `∀ n, bbpGuardAgrees n` is refuted. The
+  * `PBBP01General` (the capped statement `∀ n, bbp_hex_digit n = bbpHexDigitReal n`) is REFUTED
+    (`not_PBBP01General`, `Research/BBPCapRefutation.lean`, commit `afb672f`); its route via
+    `∀ n, bbpGuardAgrees n` was refuted earlier. The
     statement proved here is the explicit-guard one, `PBBP01ExplicitGuard`.
 -/
 import Thoughts.Proved.BBPPiIdentity

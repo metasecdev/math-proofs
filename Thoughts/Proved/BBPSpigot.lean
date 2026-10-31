@@ -10,7 +10,9 @@
   * Proved: `BBPSpigotDigitCorrect_of_guard` — if the decidable guard check
     `bbpGuardAgrees n` passes, then `BBPSpigotDigitCorrect n`, conditional only on the
     stated hypothesis `BBPPiEqualsSeries` (H-04). Concrete `n` are in `BBPGuardedCerts.lean`.
-  * P-BBP-01 for general `n` (`PBBP01General`) remains OPEN.
+  * P-BBP-01 for general `n` (`PBBP01General`, capped certificate) is REFUTED:
+    `not_PBBP01General` in `Thoughts/Research/BBPCapRefutation.lean` (commit `afb672f`).
+    The explicit-guard form (`PBBP01ExplicitGuard`) is proved for every `n`.
   * Removed: the cert-gap chain and Tier-1 cluster witnesses (they certified chance
     agreements with digit `n+1`, and four of their `hz` numerals were false).
 
@@ -85,7 +87,9 @@ def BBPSpigotDigitCorrect (n : Nat) : Prop :=
   bbp_hex_digit n = bbpHexDigitReal n
 
 /--
-  **P-BBP-01, general `n` — OPEN.** Would follow from `BBPPiEqualsSeries` plus
+  **P-BBP-01, general `n` (capped) — REFUTED** by `not_PBBP01General`
+  (`Research/BBPCapRefutation.lean`, `afb672f`: wrong digit for every `n ∈ [2^272, 2^273]`).
+  The explicit-guard form is proved for all `n`. Historically: would follow from `BBPPiEqualsSeries` plus
   `∀ n, bbpGuardAgrees n`; but the latter is FALSE as defined (the guard search is capped at
   `g ≤ 68`; `not_forall_bbpGuardAgrees` in `BBPGuardCap.lean`), so this route cannot prove it.
   See `docs/PBBP01_EXTENSION_ANALYSIS.md`.
@@ -178,7 +182,8 @@ theorem BBPSpigotDigitCorrect_of_guard (hπ : BBPPiEqualsSeries) (n : Nat)
   rw [bbpHexDigitReal_eq_series_of n hπ]
   exact bbpHexDigitCert_eq_series_of_guard n h
 
-/-- General P-BBP-01 reduces to H-04 plus the guard check at every `n` (both open). -/
+/-- General P-BBP-01 reduces to H-04 plus the guard check at every `n` (the guard hypothesis is
+false, and `PBBP01General` itself is refuted by `not_PBBP01General`). -/
 theorem PBBP01General_of_guard (hπ : BBPPiEqualsSeries) (h : ∀ n, bbpGuardAgrees n) :
     PBBP01General :=
   fun n => BBPSpigotDigitCorrect_of_guard hπ n (h n)

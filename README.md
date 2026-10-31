@@ -51,3 +51,11 @@ The toolchain is pinned in `lean-toolchain`. The Mathlib revision is pinned in
 
 The code was imported from the author's development repository; each import commit
 records the source repository and commit SHA.
+
+## Heavy certificates (not checked by CI)
+
+`lean_lib BBPHeavyCerts` (`BBPDigitsUnconditionalExt3099/5899/8299/10000` and the
+`BBPFastCerts*` modules) holds the kernel certificates for the capped digit checks up to
+n ≤ 10000. It is **not** a default target, and **CI does not build or check it**: each Lean
+process needs more than 10 GB of RAM. Build it explicitly on a large machine with
+`lake build BBPHeavyCerts`. The default build covers everything else, including n ≤ 2000.

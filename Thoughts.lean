@@ -48,3 +48,7 @@ import Thoughts.Research.BBPBaseQCert
 import Thoughts.Research.MahlerSharp7b
 import Thoughts.Research.BBPMu570b
 import Thoughts.Research.PiDigitStructure
+import Thoughts.Proved.BBPFastGuard
+import Thoughts.Research.BBPCapAnalysis
+import Thoughts.Research.BBPCapRefutation
+import Thoughts.Research.BBPCapBracket
