@@ -45,3 +45,5 @@ import Thoughts.Research.BBPMu658Fixed
 import Thoughts.Research.BBPBaseQFixed
 import Thoughts.Research.BBPBase2kFixed
 import Thoughts.Research.BBPBaseQCert
+import Thoughts.Research.MahlerSharp7b
+import Thoughts.Research.BBPMu570b
