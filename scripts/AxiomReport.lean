@@ -25,3 +25,8 @@ import Thoughts
 #print axioms FinitistProved.bbp_digit_all_n_simple
 #print axioms FinitistProved.bbp_digit_all_n_fixed
 #print axioms FinitistProved.bbp_digit_all_n_at_G
+-- (c') sharpened guard at μ = 570: B = 1795710
+#print axioms MahlerSharp7b.pi_pow16_measure7
+#print axioms FinitistProved.bbp_digit_all_n_mu570b
+#print axioms FinitistProved.bbp_digit_all_n_fixed7b
+#print axioms FinitistProved.bbp_digit_all_n_at_G7b
