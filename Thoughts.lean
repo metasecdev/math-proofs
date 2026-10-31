@@ -47,3 +47,4 @@ import Thoughts.Research.BBPBase2kFixed
 import Thoughts.Research.BBPBaseQCert
 import Thoughts.Research.MahlerSharp7b
 import Thoughts.Research.BBPMu570b
+import Thoughts.Research.PiDigitStructure
