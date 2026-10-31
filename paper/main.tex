@@ -1,0 +1,731 @@
+\documentclass[11pt]{amsart}
+
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage[margin=1.1in]{geometry}
+\usepackage[hyphens]{url}
+\usepackage[
+  pdftitle={A formally verified hexadecimal digit extraction for pi with an explicit guard for every position},
+  pdfauthor={Brian Bernard Taylor},
+  pdfsubject={11Y60, 11J82, 68V20},
+  pdfkeywords={pi, BBP formula, digit extraction, irrationality measure, Lean 4, Mathlib, formal verification},
+  pdfcreator={LaTeX (Tectonic)},
+  colorlinks=true, linkcolor=MidnightBlue, citecolor=OliveGreen, urlcolor=MidnightBlue,
+  breaklinks=true
+]{hyperref}
+
+%------------------------------------------------------------------
+% Theorem environments
+%------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{observation}[theorem]{Observation}
+
+%------------------------------------------------------------------
+% Notation
+%------------------------------------------------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dn}{d_n}
+\newcommand{\Sng}{S_{n,g}}
+\newcommand{\Eng}{E_{n,g}}
+\newcommand{\lo}{\mathrm{lo}}
+\newcommand{\hi}{\mathrm{hi}}
+\newcommand{\monus}{\mathbin{\dot{-}}}
+\newcommand{\dist}{\delta}
+\newcommand{\need}{\nu}
+\newcommand{\run}{\rho}
+\newcommand{\gap}{\gamma}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\_\do\.}
+\makeatother
+\DeclareUrlCommand\lean{\urlstyle{tt}}
+\setlength{\emergencystretch}{3em}
+\newcommand{\Bconst}{1\,795\,710}
+\newcommand{\Bsimple}{1\,795\,711}
+
+%------------------------------------------------------------------
+% Lean 4 listings
+%------------------------------------------------------------------
+\definecolor{leankw}{RGB}{0,62,138}
+\definecolor{leancomment}{RGB}{110,110,110}
+\definecolor{leanbg}{RGB}{248,248,246}
+\lstdefinelanguage{Lean4}{
+  morekeywords={theorem,lemma,def,noncomputable,abbrev,namespace,end,open,import,
+    by,fun,have,show,with,match,if,then,else,let,in,where,instance,structure,Prop,Type},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+}
+\lstset{
+  language=Lean4,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{leankw}\bfseries,
+  commentstyle=\color{leancomment}\itshape,
+  backgroundcolor=\color{leanbg},
+  frame=single, rulecolor=\color{black!15}, framesep=4pt,
+  xleftmargin=6pt, xrightmargin=6pt,
+  columns=fullflexible, keepspaces=true,
+  breaklines=true, breakatwhitespace=true,
+  showstringspaces=false, upquote=true,
+  aboveskip=8pt, belowskip=8pt,
+  extendedchars=true,
+  literate=
+    {ℕ}{{$\mathbb{N}$}}1 {ℤ}{{$\mathbb{Z}$}}1 {ℝ}{{$\mathbb{R}$}}1
+    {π}{{$\pi$}}1 {⌊}{{$\lfloor$}}1 {⌋}{{$\rfloor$}}1
+    {≤}{{$\le$}}1 {≥}{{$\ge$}}1 {≠}{{$\ne$}}1 {∧}{{$\wedge$}}1 {∨}{{$\vee$}}1
+    {¬}{{$\neg$}}1 {→}{{$\to$}}1 {↔}{{$\leftrightarrow$}}1 {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1 {·}{{$\cdot$}}1 {⟨}{{$\langle$}}1 {⟩}{{$\rangle$}}1
+    {₁}{{$_1$}}1 {₆}{{$_6$}}1 {∸}{{$\dot{-}$}}1 {∑}{{$\sum$}}1 {∈}{{$\in$}}1
+}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\title[Verified hexadecimal digits of $\pi$ for every position]
+  {A formally verified hexadecimal digit extraction for $\pi$\\
+   with an explicit guard for every position}
+
+\author{Brian Bernard Taylor}
+
+\subjclass[2020]{11Y60, 11J82, 68V20}
+\keywords{$\pi$, Bailey--Borwein--Plouffe formula, digit extraction,
+  irrationality measure, Lean~4, Mathlib, formal verification}
+
+\date{31 October 2026. Draft, not submitted.}
+
+\begin{abstract}
+We describe a Lean~4 development, built on Mathlib, about the
+Bailey--Borwein--Plouffe (BBP) formula for~$\pi$. It contains an independent
+proof that the BBP series equals~$\pi$, an integer-only certificate for the
+hexadecimal digit $d_n=\floor{16^n\pi}\bmod 16$, and a soundness theorem: when
+the two ends of the certificate's bracket agree, the certified digit is the
+true digit. To remove the dependence on that check, we formalize an explicit
+irrationality-measure bound at the denominators $16^k$: for every $k\ge1$ and
+every integer $p$,
+$\abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k$.
+From it we prove that for every $n\ge0$ and every
+$g\ge 569n+\floor{\log_{16}(n+1)}+1+\Bconst$ the certificate at guard depth
+$g$ returns $d_n$; a simpler sufficient condition is $g\ge 570n+\Bsimple$. We
+also prove a short chain of exact statements relating the run of $0$s or
+$\mathrm{F}$s after position~$n$, the distance from $16^n\pi$ to the nearest
+integer, and the least sufficient guard depth. All statements are for every
+$n$ or for explicit finite ranges; no asymptotic, probabilistic or normality
+claim is made. The proofs use only the axioms \lean{propext},
+\lean{Classical.choice} and \lean{Quot.sound}, and no \lean{native_decide}.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+The BBP formula~\cite{BBP1997}
+\begin{equation}\label{eq:bbp}
+  \pi=\sum_{k\ge0}\frac{1}{16^k}\left(\frac{4}{8k+1}-\frac{2}{8k+4}-\frac{1}{8k+5}-\frac{1}{8k+6}\right)
+\end{equation}
+lets one compute the hexadecimal digit of $\pi$ at position $n$ without
+computing the earlier digits. Every implementation computes a finite sum to
+finite precision, so the algorithm needs a \emph{guard}: enough extra digits
+that the rounding error cannot change the digit being extracted. How many extra
+digits are enough depends on how close $16^n\pi$ is to an integer, which is a
+Diophantine question about $\pi$.
+
+This paper reports a Lean~4~\cite{Mathlib2020} development that makes the
+guard explicit and proves it sufficient for every position. We use the
+following conventions throughout. For $n\in\N$ let
+\[
+  x_n=16^n\pi,\qquad d_n=\floor{x_n}\bmod 16,\qquad
+  \dist_n=\min\bigl(\{x_n\},\,1-\{x_n\}\bigr),
+\]
+so $d_0=3$, $d_1=2$, $d_2=4$, and $\dist_n$ is the distance from $x_n$ to the
+nearest integer. The certificate at guard depth $g$ uses
+$K=n+g+1$ terms, an integer sum $\Sng\in\N$, an error allowance
+$\Eng=4K+2$, and returns $\floor{(\Sng\monus\Eng)/16^g}\bmod16$
+(Section~\ref{sec:cert}).
+
+\subsection*{Contributions}
+\begin{enumerate}
+\item An independent Lean proof of~\eqref{eq:bbp}
+  (Theorem~\ref{thm:bbp}). Earlier formal proofs exist in Coq and in
+  Lean; see Section~\ref{sec:related}.
+\item An integer-only digit certificate with a soundness theorem
+  (Theorem~\ref{thm:sound}) and a distance criterion: if
+  $2\Eng<16^g\dist_n$ the bracket collapses (Lemma~\ref{lem:dist}).
+\item A formal irrationality-measure bound at the denominators $16^k$ with
+  exponent $570$ and an explicit constant (Theorem~\ref{thm:measure}).
+\item For every $n$, an explicit guard depth at which the certificate is
+  proved to return $d_n$ (Theorem~\ref{thm:main}).
+\item Exact relations between the $0$/$\mathrm{F}$ run after position $n$,
+  the distance $\dist_n$ and the least sufficient guard depth, together with a
+  kernel-checked example showing that one natural converse fails
+  (Section~\ref{sec:structure}).
+\end{enumerate}
+
+We make no claim about normality or about the statistics of the digits of
+$\pi$. Statements of the form ``for every~$n$'' are theorems; statements about
+finite ranges of digits are labeled either as kernel-checked theorems or as
+computed numerics, and the latter are not used in any proof.
+
+\subsection*{Status of the capped certificate}
+The development also contains an earlier certificate that searches only the
+guard depths $4,8,\dots,64$ and falls back to $68$. It is proved correct for
+$n\le 10000$ and proved incorrect on an explicit window near $2^{272}$; between
+these ranges it is neither proved correct nor proved incorrect.
+Appendix~\ref{app:future} describes these results. They are not part of the
+main theorem.
+
+\section{Related work}\label{sec:related}
+
+\subsection*{Formal proofs about the BBP formula}
+Bertot, Rideau and Th\'ery~\cite{BertotRideauThery2018} formalized in Coq a
+proof of the BBP formula and a digit-extraction routine, and used it to
+compute the billionth hexadecimal digit of $\pi$ inside Coq; the code is
+available as~\cite{TheryPlouffe}. Their correctness statement for the digit
+routine is a partial-correctness statement: when the routine returns a digit,
+that digit is correct. As the authors note, a routine that never returns a
+digit would also satisfy it. They also note that the HOL~Light library contains
+a formalization of the BBP formula. Our Theorem~\ref{thm:sound} plays the same
+role as their partial-correctness statement; the difference is
+Theorem~\ref{thm:main}, which supplies, for every $n$, a guard depth at which
+the check is proved to pass.
+
+In Lean, Braams's lean-DLMF project~\cite{BraamsDLMF} contains the theorem
+\lean{hasSum_bbp_pi}, the BBP formula in Mathlib's \lean{HasSum} form. That
+file was first committed publicly on 16~October 2026. Our proof of
+Theorem~\ref{thm:bbp} was developed independently and uses a different
+route (an integral representation, see Section~\ref{sec:bbp}). We do not claim
+priority for the identity.
+
+\subsection*{\texorpdfstring{Irrationality measures of $\pi$}{Irrationality measures of pi}}
+Mahler~\cite{Mahler1953} proved the first explicit bound,
+$\abs{\pi-p/q}>q^{-42}$ for all integers $p$ and $q\ge2$. Mignotte~\cite{Mignotte1974}
+lowered the exponent to about $20$, and the best published bound we know of in a refereed
+journal is $7.103205334137\ldots$ by Zeilberger and Zudilin~\cite{ZeilbergerZudilin2020}.
+Our formal exponent $570$ is far from these values; it comes from a
+deliberately simple instance of Mahler's method in which every constant is
+made explicit and checked in Lean (Section~\ref{sec:measure}). What the
+application needs is not a small exponent but an explicit constant valid for
+every $k\ge1$.
+
+\subsection*{Other formal work}
+Mathlib~\cite{Mathlib2020} proves that $\pi$ is irrational, and Eberl's
+Isabelle formalization~\cite{EberlPiTranscendental} proves that $\pi$ is
+transcendental. The Prove2Me platform~\cite{Prove2MePi} hosts a campaign of
+Lean formulations of irrationality-measure bounds for $\pi$, from Mahler's
+exponent $42$ to the value $2$ claimed in a 2026 preprint; on 31~October 2026
+its campaign page listed all of these missions as completed. The goal
+statements we inspected there are in the form ``for every $\varepsilon>0$ there
+is a threshold $Q$'', which asserts the existence of a threshold without
+giving one. A guard depth needs a threshold and a constant that are explicit,
+so we do not use those results, and we have not audited them.
+
+\section{The BBP identity}\label{sec:bbp}
+
+\begin{theorem}[\lean{bbpSeries_eq_pi}]\label{thm:bbp}
+The series~\eqref{eq:bbp} converges and its sum is $\pi$.
+\end{theorem}
+
+\begin{proof}[Outline of the formal proof]
+Write $p(x)=4-2x^3-x^4-x^5$. Since
+$\int_0^1x^{8k+j-1}\,dx=1/(8k+j)$, the $k$-th summand equals
+$\int_0^1(x^8/16)^k\,p(x)\,dx$. Dominated convergence for the geometric
+series gives
+\[
+  \sum_{k\ge0}\frac{1}{16^k}\Bigl(\cdots\Bigr)=\int_0^1\frac{p(x)}{1-x^8/16}\,dx .
+\]
+The factorizations $16-x^8=-(x^2-2)(x^2+2)(x^2+2x+2)(x^2-2x+2)$ and
+$p(x)=-(x-1)(x^2+2)(x^2+2x+2)$ reduce the integrand to
+$16(x-1)/\bigl((x^2-2)(x^2-2x+2)\bigr)$, which has the antiderivative
+$F(x)=2\log(2-x^2)-2\log(x^2-2x+2)+4\arctan(x-1)$ on $[0,1]$. Then
+$F(1)-F(0)=\pi$ by the fundamental theorem of calculus.
+\end{proof}
+
+\begin{lstlisting}
+theorem bbpSeries_eq_pi : bbpSeries = Real.pi
+\end{lstlisting}
+
+\section{The digit certificate and its soundness}\label{sec:cert}
+
+\begin{definition}[certificate]\label{def:cert}
+For $k,N\in\N$ let
+\[
+  t_k(N)=\floor*{\frac{4\cdot16^N}{16^k(8k+1)}}\monus
+  \floor*{\frac{2\cdot16^N}{16^k(8k+4)}}\monus
+  \floor*{\frac{16^N}{16^k(8k+5)}}\monus
+  \floor*{\frac{16^N}{16^k(8k+6)}},
+\]
+where $\monus$ is truncated subtraction on $\N$. For $n,g\in\N$ put
+$K=n+g+1$ and
+\[
+  \Sng=\sum_{k<K}t_k(n+g)\in\N,\qquad \Eng=4K+2,\qquad
+  \lo=\floor*{\frac{\Sng\monus\Eng}{16^g}},\qquad
+  \hi=\floor*{\frac{\Sng+\Eng}{16^g}} .
+\]
+The guard \emph{agrees at depth $g$} if $\lo=\hi$. The certified floor is
+$\lo$ and the certified digit is $\lo\bmod16$.
+\end{definition}
+
+In Lean these are \lean{bbpSpigotTerm}, \lean{bbpGuardedSum},
+\lean{bbpGuardErr}, \lean{bbpGuardedLo}, \lean{bbpGuardedHi},
+\lean{BBPGuardAgreesAt}, \lean{bbpCertFloorAt} and \lean{bbpCertDigitAt}.
+Everything is computed in $\N$. The lemma \lean{bbp_term_cast_bounds} shows
+that the truncated subtractions in $t_k(N)$ never truncate and that
+\[
+  16^N a_k-1<t_k(N)<16^N a_k+3,
+\]
+where $a_k$ is the $k$-th summand of~\eqref{eq:bbp}. Summing over $k<K$ and
+bounding the tail of the series by $1$ gives
+\[
+  \lo\le x_n<\hi+1\qquad(\text{\lean{bbpGuarded_bracket}}).
+\]
+
+\begin{theorem}[soundness; \lean{BBPGuardAgreesAt.floor_pi},
+\lean{BBPGuardAgreesAt.digit_pi}]\label{thm:sound}
+For all $n,g\in\N$, if the guard agrees at depth $g$, then
+$\floor{x_n}=\lo$ and $\lo\bmod16=d_n$.
+\end{theorem}
+
+\begin{proof}
+If $\lo=\hi$ the bracket gives $\lo\le x_n<\lo+1$, so $\lo=\floor{x_n}$;
+Theorem~\ref{thm:bbp} replaces the series by $\pi$.
+\end{proof}
+
+Agreement is decidable, so for any particular $(n,g)$ the hypothesis can be
+discharged by evaluation in the kernel. The next lemma gives a sufficient
+condition in terms of $\dist_n$.
+
+\begin{lemma}[\lean{guardAgreesAt_of_dist}]\label{lem:dist}
+Let $n,g\in\N$. If $2\Eng<16^g\abs{x_n-m}$ for every $m\in\Z$, then the guard
+agrees at depth $g$. In particular this holds when $2\Eng<16^g\dist_n$.
+\end{lemma}
+
+The factor $2$ accounts for one $\Eng$ from the error of $\Sng$ and one from
+the width of the bracket. Since $2\Eng=8n+8g+12$ grows linearly in $g$ while
+$16^g$ grows exponentially, Lemma~\ref{lem:dist} reduces the choice of a guard
+to a lower bound for $\dist_n$.
+
+\section{An irrationality measure at the denominators \texorpdfstring{$16^k$}{16\^{}k}}\label{sec:measure}
+
+\begin{theorem}[\lean{MahlerSharp7b.pi_pow16_measure7}]\label{thm:measure}
+For every integer $k\ge1$ and every $p\in\Z$,
+\[
+  \abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k .
+\]
+\end{theorem}
+
+\begin{lstlisting}
+theorem pi_pow16_measure7 :
+    ∀ k : ℕ, 1 ≤ k → ∀ p : ℤ,
+      |(16 : ℝ) ^ k * Real.pi - p| * (16 : ℝ) ^ (k * 570)
+        > (1 / 2 ^ (7182801 + 1)) * (16 : ℝ) ^ k
+\end{lstlisting}
+
+Equivalently, with $q=16^k$, $\abs{\pi-p/q}>2^{-7182802}q^{-570}$; so the
+statement is an irrationality-measure bound with exponent $570$ and an explicit
+constant, restricted to the denominators that the digit application uses.
+
+\begin{proof}[Structure of the formal proof]
+The proof follows Mahler's method~\cite{Mahler1953}, in the form used by
+Mignotte~\cite{Mignotte1974}, with every constant explicit. We list the
+ingredients in the order in which they are combined.
+\begin{enumerate}
+\item \emph{Chebyshev bound.} From Mathlib's bound for the Chebyshev function
+  $\psi$ and the estimate $2\sqrt{x}\log x\le 0.02x+8760$ for $x\ge1$ we
+  obtain $\psi(x)\le(\log4+0.02)x+8760$ (\lean{psi_le_lin7}), hence
+  $\operatorname{lcm}(1,\dots,n)\le\exp(1.4063\,n+8760)$
+  (\lean{lcm_le_exp_lin7}). Here $1.4063$ is a rational upper bound for
+  $\log 4+0.02$.
+\item \emph{Remainder.} For $n\ge1000$ the auxiliary remainder terms satisfy a
+  tail bound of the form $(8.55/(m+1))^J$ (\lean{remainder_sharp7}); this uses
+  $\pi e<8.5398$. Specialized to $m=141$ and $n=4k+12600$, it gives the
+  smallness hypothesis of the next step for every $h\le141$
+  (\lean{remainder_spec7}).
+\item \emph{Mahler--Mignotte step.} A nonvanishing determinant argument
+  (\lean{pi_lower_bound_sharp}) shows that whenever $\abs{\pi-p/q}\le1$,
+  \[
+    1\le(2q)^{m}\,\abs{\pi-p/q}\;T,
+  \]
+  where $T$ collects the size of the auxiliary coefficients.
+\item \emph{Size of $T$.} With $m=141$ and $n=4k+12600$, the bound
+  $T\le2^{7182660+1716k}$ holds for every $k$ (\lean{T_spec7}).
+\item \emph{Exponent arithmetic.} With $q=16^k$ we have
+  $(2q)^{141}=2^{141+564k}$, so
+  $\abs{\pi-p/q}\ge2^{-(141+7182660)}\cdot2^{-(564+1716)k}$.
+  Since $141+7182660=7182801$ and $564+1716=2280=4\cdot570$, this is
+  $2^{-7182801}\,16^{-570k}$. Passing to the strict inequality costs one
+  more factor of $2$, which gives the constant $2^{-7182802}$. The case
+  $\abs{\pi-p/q}>1$ is immediate.
+\end{enumerate}
+The remaining parameters ($m=141$, the offset $12600$, the constants $0.02$
+and $8760$) were chosen numerically to keep the exponent and the constant
+moderate; the choice affects only the size of the constants, never
+correctness.
+\end{proof}
+
+\begin{remark}
+The same development contains an earlier bound with exponent $658$ and
+constant $2^{-1720001}$ (\lean{MahlerSharp.pi_pow16_measure6}), used in
+Remark~\ref{rem:658}.
+\end{remark}
+
+\section{The main theorem: an explicit guard for every position}\label{sec:main}
+
+Combining Lemma~\ref{lem:dist} with Theorem~\ref{thm:measure} gives a guard
+depth that is sufficient for every $n$. Define
+\[
+  g(n)=569n+\floor{\log_{16}(n+1)}+1+B,\qquad B=\Bconst .
+\]
+
+\begin{theorem}[\lean{bbp_digit_all_n_mu570b}]\label{thm:main}
+For every $n\in\N$, the guard agrees at depth $g(n)$, and
+\[
+  \floor{16^n\pi}=\lo(n,g(n)),\qquad \lo(n,g(n))\bmod16=d_n .
+\]
+Moreover the same holds at every depth $g\ge g(n)$
+(\lean{bbp_guard_mu570b_of_ge}).
+\end{theorem}
+
+\begin{corollary}[\lean{bbp_digit_all_n_fixed7b}]\label{cor:simple}
+For all $n,g\in\N$ with $g\ge570n+\Bsimple$, the certificate at depth $g$
+returns $\floor{16^n\pi}$ and $d_n$.
+\end{corollary}
+
+\begin{lstlisting}
+theorem bbp_digit_all_n_mu570b (n : ℕ) :
+    ⌊(16 : ℝ) ^ n * Real.pi⌋ =
+        (bbpCertFloorAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710) : ℤ) ∧
+      bbpCertDigitAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710)
+        = bbpHexDigitReal n
+
+theorem bbp_digit_all_n_fixed7b (n g : ℕ) (hg : 570 * n + 1795711 ≤ g) :
+    ⌊(16 : ℝ) ^ n * Real.pi⌋ = (bbpCertFloorAt n g : ℤ) ∧
+      bbpCertDigitAt n g = bbpHexDigitReal n
+\end{lstlisting}
+
+\begin{proof}[Outline]
+Write $g=569n+L+j$ with $L=\floor{\log_{16}(n+1)}+1$, so that
+$n+1\le16^L$. The generic lemma \lean{guard_agrees_of_const} shows that
+$\mathrm{BBPGuardAgreesAt}(n,g)$ holds for every $n$ as soon as $j\ge1$ and
+$(8\cdot570+20)(j+1)\le2^{-7182802}\,16^{j}$. For $n\ge1$ it combines
+Theorem~\ref{thm:measure} (with $k=n$), which gives
+$\dist_n>2^{-7182802}\,16^{-569n}$, with Lemma~\ref{lem:dist}; for $n=0$ it
+uses a direct lower bound for the distance from $\pi$ to the nearest
+integer. The constant is computed exactly in Lean:
+$\ell=\floor{\log_{16}\lceil4580\cdot2^{7182802}\rceil}+1=1795704$
+(\lean{guardLogL_570b}), since $4580\cdot2^{7182802}=18320\cdot16^{1795700}$,
+and $j=\ell+\floor{\log_{16}(2\ell)}+1=1795704+5+1=\Bconst$
+(\lean{guardLogConst_570b}). Corollary~\ref{cor:simple} follows from monotonicity in $g$ and
+$\floor{\log_{16}(n+1)}\le n$.
+\end{proof}
+
+\begin{remark}[the exponent-$658$ guard]\label{rem:658}
+The earlier bound gives the guard
+$657n+\floor{\log_{16}(n+1)}+1+430009$ (\lean{bbp_digit_all_n_mu658}), also
+proved for every $n$. It exceeds $g(n)$ by $88n-1365701$, so it is the smaller
+of the two for $n\le15519$ and the larger for $n\ge15520$. Both theorems
+hold for every $n$, so one can take the minimum.
+\end{remark}
+
+\subsection*{How far the proved guard is from what is needed}
+Let $\need(n)$ be the least $g$ with $2\Eng<16^g\dist_n$ (in Lean,
+\lean{piNeed}; it exists because $\pi$ is irrational). Table~\ref{tab:guard}
+compares the proved guards with $\need(n)$ at a few positions. The column
+$\need(n)$ is \emph{computed numerics}, obtained with \texttt{mpmath} at
+precision $4n+400$ bits; it is not a Lean theorem and no result in this paper
+depends on it. The other columns are values of the formulas in
+Theorem~\ref{thm:main}, Corollary~\ref{cor:simple} and Remark~\ref{rem:658}.
+
+\begin{table}[ht]
+\centering
+\caption{Proved guard depths and the least sufficient depth $\need(n)$.
+The last column is computed numerics, not a Lean theorem.}
+\label{tab:guard}
+\begin{tabular}{@{}r r r r r@{}}
+\toprule
+$n$ & $g(n)$ (Thm.~\ref{thm:main}) & $570n+\Bsimple$ & exponent $658$ & $\need(n)$ (numerics)\\
+\midrule
+$0$       & 1\,795\,711   & 1\,795\,711   & 430\,010      & 2\\
+$1$       & 1\,796\,280   & 1\,796\,281   & 430\,667      & 2\\
+$10$      & 1\,801\,401   & 1\,801\,411   & 436\,580      & 3\\
+$100$     & 1\,852\,612   & 1\,852\,711   & 495\,711      & 4\\
+$1000$    & 2\,364\,713   & 2\,365\,711   & 1\,087\,012   & 4\\
+$10^4$    & 7\,485\,714   & 7\,495\,711   & 7\,000\,013   & 5\\
+$10^5$    & 58\,695\,715  & 58\,795\,711  & 66\,130\,014  & 6\\
+$10^6$    & 570\,795\,715 & 571\,795\,711 & 657\,430\,014 & 7\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The proved guards are very far from $\need(n)$. They are meant as a
+correctness guarantee for every position, not as a practical precision
+choice: in practice one runs the decidable check of Theorem~\ref{thm:sound}
+at a small depth, and Theorem~\ref{thm:main} guarantees that a depth at which
+the check passes exists and is at most $g(n)$.
+
+\section{Runs, distance and need}\label{sec:structure}
+
+This section relates three quantities attached to a position $n$. All
+results are theorems for every $n$, except where an explicit range is stated.
+
+\begin{definition}
+Let $\run(n)$ be the length of the maximal block of equal digits starting at
+position $n+1$ that consists only of $0$s or only of $\mathrm{F}$s
+(\lean{piRun}; $\run(n)=0$ if $d_{n+1}\notin\{0,\mathrm{F}\}$). For
+$s\in\N$, if some digit $d_{s+k}$ with $k\ge0$ equals $1$, let $\gap(s)$ be the
+least such $k$ (\lean{piGapSeq}).
+\end{definition}
+
+The block in $\run(n)$ is finite because $\pi$ is irrational, so the Lean
+definition uses \lean{Nat.find} together with Mathlib's \lean{irrational_pi}.
+The Lean definition of $\gap(s)$ returns $0$ when no later $1$ exists. Every
+statement below that involves $\gap$ carries the hypothesis that some later
+digit equals $1$; we do not prove that this hypothesis holds for every $s$.
+
+\begin{theorem}[\lean{piDist_run}]\label{thm:distrun}
+For every $n$, \ $16^{-(\run(n)+1)}<\dist_n<16^{-\run(n)}$.
+\end{theorem}
+
+\begin{theorem}[\lean{piNeed_bounds}]\label{thm:needbounds}
+For every $n$, with $c_n=\lceil\log_{16}(8n+8\need(n)+12)\rceil$,
+\[
+  \run(n)+c_n\le\need(n)\le\run(n)+c_n+1 .
+\]
+\end{theorem}
+
+In Lean $c_n$ is \texttt{Nat.clog~16 (2~*~bbpGuardErr~n (piNeed~n))}, and
+$2E_{n,\need(n)}=8n+8\need(n)+12$. Both inequalities in
+Theorems~\ref{thm:distrun} and~\ref{thm:needbounds} are sharp in the sense
+that equality cannot occur in the strict ones: $16^k\dist_n\ne1$ because
+$\pi$ is irrational.
+
+\begin{theorem}[\lean{forced_chain}]\label{thm:chain}
+For every $n$:
+\begin{enumerate}
+\item the digits $d_{n+1},\dots,d_{n+\run(n)}$ are not equal to $1$;
+\item if some digit $d_{n+1+k}$ $(k\ge0)$ equals $1$, then
+  $\run(n)\le\gap(n+1)$;
+\item $16^{-(\run(n)+1)}<\dist_n<16^{-\run(n)}$;
+\item $\run(n)+c_n\le\need(n)\le\run(n)+c_n+1$;
+\item the guard agrees at every depth $g\ge\need(n)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}[\lean{long_run_forces}]
+If $L\le\run(n)$, then the digits $d_{n+1},\dots,d_{n+L}$ are not $1$; if
+moreover some later digit equals $1$, then $\gap(n+1)\ge L$; and
+$\dist_n<16^{-L}$ and $\need(n)\ge L+c_n$.
+\end{corollary}
+
+So a long run forces a long gap before the next $1$, a small distance and a
+large need. The converse implication fails, and a single kernel-checked
+example shows it.
+
+\begin{proposition}[\lean{long_gap_short_run}]\label{prop:converse}
+$\run(77)=0$ and $\gap(78)=49$.
+\end{proposition}
+
+\begin{proof}
+The lemma \lean{cert_78_127} checks, by \mbox{\texttt{decide +kernel}}, that the
+certificate's guard agrees at positions $78,\dots,127$, that $d_{78}=3$, that
+none of $d_{78},\dots,d_{126}$ equals $1$, and that $d_{127}=1$.
+Theorem~\ref{thm:sound} turns these checks into statements about the true
+digits.
+\end{proof}
+
+Proposition~\ref{prop:converse} shows that a long gap between $1$s does not
+force a run of $0$s or $\mathrm{F}$s, a small $\dist_n$, or a large
+$\need(n)$. Supporting lemmas in the same file include the countdown
+identities \lean{piRun_succ}, \lean{piRun_add} and \lean{piGapSeq_countdown},
+the bound \lean{piRun_le_inter_one_gap}, and \lean{piRun_pos_cases}, which
+records that a nonempty $0$-run means $x_n$ lies just above an integer and an
+$\mathrm{F}$-run that it lies just below one.
+
+\section{The Lean development}\label{sec:lean}
+
+\subsection*{Toolchain}
+The development uses Lean \lean{leanprover/lean4:v4.29.0-rc8} and Mathlib at
+commit \lean{816ff4582a01b10567d1d4ecb10be7c4ff92aab4}, as recorded in
+\lean{lake-manifest.json}. All proofs are in the namespace
+\lean{FinitistProved} unless another namespace is shown; the results of
+Section~\ref{sec:structure} are in \lean{FinitistProved.PiDigitStructure}.
+
+\subsection*{Axioms and decision procedures}
+For each theorem in Table~\ref{tab:names}, \mbox{\texttt{\#print axioms}} reports no
+axioms beyond \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
+(\lean{cert_78_127} uses only \lean{propext}); in particular there is no
+\lean{sorryAx}. Finite
+computations are checked with \mbox{\texttt{decide +kernel}}, so they are evaluated by
+the kernel; \lean{native_decide}, which would add the compiler to the trusted
+base, is not used.
+
+\subsection*{Theorem names}
+Table~\ref{tab:names} lists the Lean name, the file and the commit for each
+numbered result. The results currently live on three branches of the
+development repository; Section~\ref{sec:snapshot} describes the single
+public snapshot that will replace these references.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Results and their Lean names. Commits: (a)~\texttt{2c596fe}
+(branch \texttt{research/sharpen-guard-2}); (b)~\texttt{881fc80} (branch
+\texttt{research/cap-bracket}); (c)~\texttt{7d37c5d} (branch
+\texttt{research/digit-structure}). Results marked (a) also exist at (b) and
+(c) and on \texttt{main} (\texttt{ad5468a}) unless marked ``only''. File paths are relative to \texttt{Thoughts/}.}
+\label{tab:names}
+\footnotesize
+\begin{tabular}{@{}>{\raggedright}p{0.10\textwidth} >{\raggedright}p{0.47\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
+\toprule
+Result & Lean name & File (commit)\\
+\midrule
+Thm.~\ref{thm:bbp} & \lean{bbpSeries_eq_pi} & \lean{Proved/BBPPiIdentity.lean} (a)\\
+Thm.~\ref{thm:sound} & \lean{BBPGuardAgreesAt.floor_pi}, \lean{BBPGuardAgreesAt.digit_pi} & \lean{Proved/BBPExplicitGuard.lean} (a)\\
+Lem.~\ref{lem:dist} & \lean{guardAgreesAt_of_dist} & \lean{Research/BBPConditionalAllN.lean} (a)\\
+Thm.~\ref{thm:measure} & \lean{MahlerSharp7b.pi_pow16_measure7} & \lean{Research/MahlerSharp7b.lean} (a only)\\
+Thm.~\ref{thm:main} & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean} (a only)\\
+Cor.~\ref{cor:simple} & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean} (a only)\\
+Rem.~\ref{rem:658} & \lean{bbp_digit_all_n_mu658} & \lean{Research/BBPMu658.lean} (a)\\
+Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lean} (c only)\\
+Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file (c only)\\
+Thm.~\ref{thm:chain} & \lean{forced_chain}, \lean{long_run_forces} & same file (c only)\\
+Prop.~\ref{prop:converse} & \lean{long_gap_short_run}, \lean{cert_78_127} & same file (c only)\\
+Thm.~\ref{thm:cap10000} & \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional} & \lean{Proved/BBPDigitsUnconditionalExt10000.lean} (b only)\\
+Thm.~\ref{thm:capwrong} & \lean{not_BBPSpigotDigitCorrect_window'}, \lean{not_BBPSpigotDigitCorrect_window} & \lean{Research/BBPCapBracket.lean}, \lean{Research/BBPCapRefutation.lean} (b only)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Dependencies}
+The import closure of \lean{PiDigitStructure.lean} contains seven modules of
+the development (the BBP algebra, series, tail, guarded-certificate and
+identity files, a definitions file, and the file itself). The import closures
+of the main theorem and of the capped-certificate results currently also
+contain unrelated modules of the same repository; they are not used by the
+proofs, and the public snapshot removes them.
+
+\subsection{Plan for the public snapshot}\label{sec:snapshot}
+Before publication the theorem references above will be replaced by a single
+public commit of a separate repository containing only the modules needed for
+Table~\ref{tab:names}, with the Mathlib revision fixed in the Lake
+configuration as well as in the manifest, Mathlib-style names, and a
+generated axiom report. Table~\ref{tab:names} will then cite that one commit.
+
+\section*{Acknowledgements}
+The author used AI assistants (Grok Bot) as tools for drafting Lean proofs,
+running computations and editing this text. All statements were checked by
+the Lean kernel or, where marked as numerics, by independent computation;
+the author is responsible for the content.
+
+\appendix
+
+\section{Future work: the capped certificate}\label{app:future}
+
+\subsection{Definition}
+The development's original certificate does not use an explicit guard. It
+tries the depths $4,8,12,\dots,64$ in order and stops at the first depth at
+which the guard agrees; if none agrees it uses depth $68$
+(\lean{bbpCertGuard}, \lean{bbpGuardSearch}). Its digit at position $n$ is
+then compared with $d_n$; the statement that they are equal is
+\mbox{\texttt{BBPSpigotDigitCorrect n}}. When the search stops at an agreeing depth,
+Theorem~\ref{thm:sound} applies and the digit is correct. The question is
+what happens at the positions where no depth up to $64$ agrees.
+
+\subsection{What is proved}
+
+\begin{theorem}\label{thm:cap10000}
+For every $n\le10000$ the capped certificate returns $d_n$.
+\end{theorem}
+
+In Lean this is \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional}. The
+proof uses a fast natural-number checker (\lean{BBPFastGuard.lean}), proved
+to agree with the guard test, and checks in the kernel, in blocks, that the
+guard agrees for each $n\le10000$ at the depth the search selects; it then
+applies Theorem~\ref{thm:sound}. The bound $10000$ reflects the cost of the check,
+not a mathematical limit.
+
+\begin{theorem}\label{thm:capwrong}
+For every $n$ with $2^{272}-71\le n$ and $5n+348\le14\cdot2^{272}$, the capped
+certificate does not return $d_n$. In particular this holds for every
+$n\in[2^{272},2^{273}]$.
+\end{theorem}
+
+In Lean these are \lean{not_BBPSpigotDigitCorrect_window'} (general window)
+and \lean{not_BBPSpigotDigitCorrect_window} (the interval
+$[2^{272},2^{273}]$).
+
+For the positions $10001\le n\le2^{272}-72$ neither correctness nor failure
+of the capped certificate is proved. We do not claim that it fails there.
+
+\subsection{Mechanism}
+For $n\ge1$ the lower end of the bracket satisfies, at every depth~$g$,
+\[
+  16^gx_n-(5K+3)-16^g<\lo\cdot16^g\le16^gx_n-(K+2)
+  \qquad(\text{\lean{guardedLo_position}}),
+\]
+with $K=n+g+1$. Thus $\lo$ is biased downward from $x_n$ by at least
+$(K+2)/16^g$. For $n\ge2^{253}$ no depth up to $64$ can agree
+(\lean{bbpCertGuard_eq_68}), so the search uses $g=68$. Once
+$16^{68}\le K+2$, that is, $n\ge2^{272}-71$, the downward bias is at least one
+unit, while the upper condition $5K+3\le14\cdot16^{68}$ keeps $\lo$ within the
+next lower integer; together they force $\lo\bmod16\ne d_n$
+(\lean{lo_digit_ne_of_window}). Below $2^{272}-71$ the bias is smaller than
+one unit, and whether the capped digit is wrong depends on the actual digits
+of $\pi$ after position $n$ (roughly, on a run of about $68-\log_{16}n$ zeros
+or $\mathrm{F}$s). No argument in the development decides that.
+
+\subsection{Directions}
+\begin{enumerate}
+\item \emph{Sharper constants.} The exponent $570$ and the constant $B$ come
+  from the factor $1.4063$ in the bound for $\operatorname{lcm}(1,\dots,n)$
+  and from the other explicit choices in Section~\ref{sec:measure}. Sharper
+  explicit Chebyshev bounds would lower both.
+\item \emph{Kernel-checked tables of $\need(n)$.} The values in the last
+  column of Table~\ref{tab:guard} could be turned into kernel-checked
+  statements for explicit ranges, using Theorem~\ref{thm:needbounds} and the
+  decidable check.
+\item \emph{Finite digit-pattern observations.} A separate computation on
+  $d_0,\dots,d_{100000}$, with positions $n\le99800$, found the patterns in
+  Observation~\ref{obs:finite}. These are finite observations, not theorems:
+  they are not proved in Lean, they say nothing about larger $n$, and several
+  similar patterns that held up to $n\approx21000$ failed before $n=99800$.
+\end{enumerate}
+
+\begin{observation}[computed, finite range only]\label{obs:finite}
+On the stated ranges, with $\need$ computed exactly from rational
+arithmetic:
+\begin{enumerate}
+\item no hexadecimal digit occurs $5$ times in a row in $d_1,\dots,d_{100000}$;
+\item for $n\le99800$, there are never $4$ consecutive gaps of length at least
+  $32$ between successive $1$s, and never $3$ consecutive such gaps of length
+  at least $48$;
+\item $\need(n)\le10$ for every $n\le99800$, with equality only at
+  $n=20174$ and $n=79938$;
+\item every block of $810$ consecutive positions in $[1904,99800]$ contains an
+  $n$ with $\need(n)\ge7$, and every block of $549$ consecutive positions in
+  $[161,99800]$ contains an $n$ with $\need(n)\ge6$.
+\end{enumerate}
+Patterns that held for $n\le21000$ but not for $n\le99800$ include: the
+largest gap between successive $1$s grew from $102$ to $142$; the number of
+blocks of four equal digits grew from $3$ to $20$; and the least distance
+between successive runs of length $3$ dropped from $268$ to $32$.
+\end{observation}
+
+\bibliographystyle{amsplain}
+\bibliography{refs}
+
+\end{document}
