@@ -1,0 +1,17 @@
+/.lake
+*.olean
+*.ilean
+.DS_Store
+/paper/*.aux
+/paper/*.log
+/paper/*.out
+/paper/*.bbl
+/paper/*.blg
+/paper/*.toc
+/axioms-report.txt
+._*
+# Never commit secrets
+.env
+*.pem
+*.key
+__pycache__/
