@@ -354,23 +354,23 @@ ingredients in the order in which they are combined.
 \begin{enumerate}
 \item \emph{Chebyshev bound.} From Mathlib's bound for the Chebyshev function
   $\psi$ and the estimate $2\sqrt{x}\log x\le 0.02x+8760$ for $x\ge1$ we
-  obtain $\psi(x)\le(\log4+0.02)x+8760$ (\lean{psi_le_lin7}), hence
+  obtain $\psi(x)\le(\log4+0.02)x+8760$ (\lean{LcmChebyshevSharp7b.psi_le_lin7}), hence
   $\operatorname{lcm}(1,\dots,n)\le\exp(1.4063\,n+8760)$
-  (\lean{lcm_le_exp_lin7}). Here $1.4063$ is a rational upper bound for
+  (\lean{LcmChebyshevSharp7b.lcm_le_exp_lin7}). Here $1.4063$ is a rational upper bound for
   $\log 4+0.02$.
 \item \emph{Remainder.} For $n\ge1000$ the auxiliary remainder terms satisfy a
-  tail bound of the form $(8.55/(m+1))^J$ (\lean{remainder_sharp7}); this uses
+  tail bound of the form $(8.55/(m+1))^J$ (\lean{MahlerSharp7b.remainder_sharp7}); this uses
   $\pi e<8.5398$. Specialized to $m=141$ and $n=4k+12600$, it gives the
   smallness hypothesis of the next step for every $h\le141$
-  (\lean{remainder_spec7}).
+  (\lean{MahlerSharp7b.remainder_spec7}).
 \item \emph{Mahler--Mignotte step.} A nonvanishing determinant argument
-  (\lean{pi_lower_bound_sharp}) shows that whenever $\abs{\pi-p/q}\le1$,
+  (\lean{MahlerSharp.pi_lower_bound_sharp}) shows that whenever $\abs{\pi-p/q}\le1$,
   \[
     1\le(2q)^{m}\,\abs{\pi-p/q}\;T,
   \]
   where $T$ collects the size of the auxiliary coefficients.
 \item \emph{Size of $T$.} With $m=141$ and $n=4k+12600$, the bound
-  $T\le2^{7182660+1716k}$ holds for every $k$ (\lean{T_spec7}).
+  $T\le2^{7182660+1716k}$ holds for every $k$ (\lean{MahlerSharp7b.T_spec7}).
 \item \emph{Exponent arithmetic.} With $q=16^k$ we have
   $(2q)^{141}=2^{141+564k}$, so
   $\abs{\pi-p/q}\ge2^{-(141+7182660)}\cdot2^{-(564+1716)k}$.
