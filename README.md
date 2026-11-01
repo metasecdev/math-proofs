@@ -36,6 +36,37 @@ trusted.
 * No `sorry`, and no `native_decide` (so `Lean.ofReduceBool` never appears).
 * `#print axioms` on the key theorems may list only Lean's three standard axioms:
   `propext`, `Classical.choice`, `Quot.sound`. CI fails on anything else.
+* The list of key theorems is `Thoughts/Axioms.lean` (not imported by `Thoughts.lean`). CI runs
+  `lake env lean Thoughts/Axioms.lean` after `lake build`, gates the output with
+  `scripts/check_axioms.py`, and uploads it as the `axioms-report` artifact.
+  `scripts/check_axioms.py` also scans every `.lean` file for `sorry`, `admit`, `native_decide`,
+  `axiom`, `implemented_by` and `extern`.
+
+## Main results
+
+Names and files on `main`. The paper is `paper/main.tex`; section numbers refer to it.
+All declarations are in the namespace `FinitistProved` unless another namespace is shown.
+Names are unchanged from the source development (no renames yet).
+
+| Result (paper) | Lean name | File |
+|---|---|---|
+| BBP identity (Sec. 3) | `bbpSeries_eq_pi` | `Thoughts/Proved/BBPPiIdentity.lean` |
+| Soundness of the certificate (Sec. 4) | `BBPGuardAgreesAt.floor_pi`, `BBPGuardAgreesAt.digit_pi` | `Thoughts/Proved/BBPExplicitGuard.lean` |
+| An agreeing guard exists for every `n` | `bbp_explicit_guard_all_n` | `Thoughts/Proved/BBPExplicitGuard.lean` |
+| Distance criterion (Sec. 4) | `guardAgreesAt_of_dist` | `Thoughts/Research/BBPConditionalAllN.lean` |
+| Irrationality measure at `16^k`: `\|16^k π − p\| · 16^(570k) > 2^-7182802 · 16^k` (Sec. 5) | `MahlerSharp7b.pi_pow16_measure7` | `Thoughts/Research/MahlerSharp7b.lean` |
+| **Main theorem** (Sec. 6): every guard depth `g ≥ 570·n + 1795711` returns `⌊16ⁿπ⌋` and the `n`-th hex digit | `bbp_digit_all_n_fixed7b` | `Thoughts/Research/BBPMu570b.lean` |
+| Main theorem, refined depth `569·n + ⌊log₁₆(n+1)⌋ + 1 + B` with `B = 1795710` (Sec. 6) | `bbp_digit_all_n_mu570b`, `bbp_guard_mu570b_of_ge` | `Thoughts/Research/BBPMu570b.lean` |
+| Exponent-658 guard `657·n + ⌊log₁₆(n+1)⌋ + 1 + 430009` (remark, Sec. 6) | `bbp_digit_all_n_mu658` | `Thoughts/Research/BBPMu658.lean` |
+| Runs, distance and need (Sec. 7) | `PiDigitStructure.piDist_run`, `piNeed_bounds`, `forced_chain`, `long_run_forces` | `Thoughts/Research/PiDigitStructure.lean` |
+| `ρ(77) = 0` and `γ(78) = 49` (Sec. 7) | `PiDigitStructure.long_gap_short_run`, `cert_78_127` | `Thoughts/Research/PiDigitStructure.lean` |
+| Capped certificate returns a wrong digit for `2^272 − 71 ≤ n`, `5n + 348 ≤ 14·2^272` (Appendix A) | `not_BBPSpigotDigitCorrect_window'`, `not_BBPSpigotDigitCorrect_window` | `Thoughts/Research/BBPCapBracket.lean`, `Thoughts/Research/BBPCapRefutation.lean` |
+| Capped certificate correct for `n ≤ 10000` (Appendix A; **pending the heavy build**, not checked by CI) | `BBPSpigotDigitCorrect_of_le_10000_unconditional` | `Thoughts/Proved/BBPDigitsUnconditionalExt10000.lean` |
+| Capped certificate correct for `n ≤ 2000` (checked by CI) | `BBPSpigotDigitCorrect_of_le_2000_unconditional` | `Thoughts/Proved/BBPDigitsUnconditionalExt2000.lean` |
+
+Earlier, weaker versions of the main theorem remain in the tree (`MahlerPiMeasure`,
+`MahlerSharp`, `MahlerSharp7`, `BBPUnconditionalAllN`, `BBPGuardLog`, `BBPMu570*`); they are
+listed in the second block of `Thoughts/Axioms.lean`.
 
 ## Building
 
@@ -57,5 +88,12 @@ records the source repository and commit SHA.
 `lean_lib BBPHeavyCerts` (`BBPDigitsUnconditionalExt3099/5899/8299/10000` and the
 `BBPFastCerts*` modules) holds the kernel certificates for the capped digit checks up to
 n ≤ 10000. It is **not** a default target, and **CI does not build or check it**: each Lean
-process needs more than 10 GB of RAM. Build it explicitly on a large machine with
-`lake build BBPHeavyCerts`. The default build covers everything else, including n ≤ 2000.
+process needs more than 10 GB of RAM. Build it explicitly on a large machine, then audit its axioms:
+
+```
+lake build BBPHeavyCerts
+lake env lean Thoughts/AxiomsHeavy.lean 2>&1 | tee axioms-heavy.log
+python3 scripts/check_axioms.py axioms-heavy.log
+```
+
+The default build covers everything else, including n ≤ 2000.
