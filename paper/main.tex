@@ -214,8 +214,10 @@ Theorem~\ref{thm:main}, which supplies, for every $n$, a guard depth at which
 the check is proved to pass.
 
 In Lean, Braams's lean-DLMF project~\cite{BraamsDLMF} contains the theorem
-\lean{hasSum_bbp_pi}, the BBP formula in Mathlib's \lean{HasSum} form. That
-file was first committed publicly on 16~October 2026. Our proof of
+\lean{hasSum_bbp_pi}, the BBP formula in Mathlib's \lean{HasSum} form, now in
+the file \texttt{DLMF/Constants/BBP.lean}. The theorem was first committed
+publicly on 16~October 2026, in the file \texttt{AAR/Constants/BBP.lean},
+which was renamed to its present path on 21~October 2026. Our proof of
 Theorem~\ref{thm:bbp} was developed independently and uses a different
 route (an integral representation, see Section~\ref{sec:bbp}). We do not claim
 priority for the identity.
@@ -234,14 +236,10 @@ every $k\ge1$.
 \subsection*{Other formal work}
 Mathlib~\cite{Mathlib2020} proves that $\pi$ is irrational, and Eberl's
 Isabelle formalization~\cite{EberlPiTranscendental} proves that $\pi$ is
-transcendental. The Prove2Me platform~\cite{Prove2MePi} hosts a campaign of
-Lean formulations of irrationality-measure bounds for $\pi$, from Mahler's
-exponent $42$ to the value $2$ claimed in a 2026 preprint; on 31~October 2026
-its campaign page listed all of these missions as completed. The goal
-statements we inspected there are in the form ``for every $\varepsilon>0$ there
-is a threshold $Q$'', which asserts the existence of a threshold without
-giving one. A guard depth needs a threshold and a constant that are explicit,
-so we do not use those results, and we have not audited them.
+transcendental. The Prove2Me platform~\cite{Prove2MePi} hosts Lean
+formulations of irrationality-measure bounds for $\pi$; the goal statements
+we inspected assert the existence of a threshold for every $\varepsilon>0$
+without giving explicit constants, so we do not use them.
 
 \section{The BBP identity}\label{sec:bbp}
 
@@ -278,7 +276,8 @@ For $k,N\in\N$ let
   \floor*{\frac{16^N}{16^k(8k+5)}}\monus
   \floor*{\frac{16^N}{16^k(8k+6)}},
 \]
-where $\monus$ is truncated subtraction on $\N$. For $n,g\in\N$ put
+where $\monus$ is truncated subtraction on $\N$, and the subtractions in
+$t_k(N)$ are grouped from the left. For $n,g\in\N$ put
 $K=n+g+1$ and
 \[
   \Sng=\sum_{k<K}t_k(n+g)\in\N,\qquad \Eng=4K+2,\qquad
@@ -298,7 +297,7 @@ that the truncated subtractions in $t_k(N)$ never truncate and that
   16^N a_k-1<t_k(N)<16^N a_k+3,
 \]
 where $a_k$ is the $k$-th summand of~\eqref{eq:bbp}. Summing over $k<K$ and
-bounding the tail of the series by $1$ gives
+bounding the tail of the series by less than $1$ gives
 \[
   \lo\le x_n<\hi+1\qquad(\text{\lean{bbpGuarded_bracket}}).
 \]
