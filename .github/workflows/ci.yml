@@ -35,10 +35,18 @@ jobs:
           set -o pipefail
           lake build 2>&1 | tee build.log
 
-      - name: Axiom report for key theorems
+      - name: Axiom report for key theorems (Thoughts/Axioms.lean)
         run: |
           set -o pipefail
-          lake env lean scripts/AxiomReport.lean 2>&1 | tee axioms.log
+          lake env lean Thoughts/Axioms.lean 2>&1 | tee axioms.log
 
       - name: Axiom / sorry / native_decide gate
         run: python3 scripts/check_axioms.py build.log axioms.log
+
+      - name: Upload axiom report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axioms-report
+          path: axioms.log
+          if-no-files-found: warn
