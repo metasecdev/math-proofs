@@ -521,10 +521,9 @@ For every $n$, with $c_n=\lceil\log_{16}(8n+8\need(n)+12)\rceil$,
 \end{theorem}
 
 In Lean $c_n$ is \texttt{Nat.clog~16 (2~*~bbpGuardErr~n (piNeed~n))}, and
-$2E_{n,\need(n)}=8n+8\need(n)+12$. Both inequalities in
-Theorems~\ref{thm:distrun} and~\ref{thm:needbounds} are sharp in the sense
-that equality cannot occur in the strict ones: $16^k\dist_n\ne1$ because
-$\pi$ is irrational.
+$2E_{n,\need(n)}=8n+8\need(n)+12$. The inequalities in
+Theorem~\ref{thm:distrun} are strict: $16^k\dist_n\ne1$ for every $k$,
+because $\pi$ is irrational.
 
 \begin{theorem}[\lean{forced_chain}]\label{thm:chain}
 For every $n$:
