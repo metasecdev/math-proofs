@@ -20,10 +20,13 @@
     `n ≤ 300` / `n ≤ 1000` theorems are re-derived from the new ones.
 
   NOT proved, and not claimed:
-  * **No bound on `g` in terms of `n`.** The `g` in the all-`n` theorem is existential. A bound
-    like `g ≤ C·n + C'` would follow from an effective irrationality measure of π with explicit
-    constants (not in Mathlib; not attempted). Equivalently, `g(n)` is governed by the length of
-    the run of hex `0`s / `F`s of π after position `n`.
+  * In THIS file the `g` of the all-`n` theorem is existential. Explicit linear bounds are proved
+    elsewhere from explicit irrationality measures of π at `q = 16^k`:
+    `Research/BBPMu570b.lean` (`bbp_digit_all_n_mu570b`: depth `569·n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`;
+    `bbp_digit_all_n_fixed7b`: every `g ≥ 570·n + 1795711`), from
+    `MahlerSharp7b.pi_pow16_measure7`; earlier `BBPMu658.lean`, `BBPMu570.lean`.
+    The least sufficient depth is governed by the run of hex `0`s / `F`s of π after position `n`
+    (`Research/PiDigitStructure.lean`, `piNeed_bounds`).
   * Nothing about normality of π.
   * `PBBP01General` (the capped statement `∀ n, bbp_hex_digit n = bbpHexDigitReal n`) is REFUTED
     (`not_PBBP01General`, `Research/BBPCapRefutation.lean`, commit `afb672f`); its route via

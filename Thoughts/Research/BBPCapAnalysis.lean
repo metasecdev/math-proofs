@@ -83,7 +83,8 @@ theorem cap_certifiable_iff (n G : ℕ) :
 /-- Under the proved measure the cap `G ≤ 68` certifies no `n` at all. -/
 theorem cap68_certifies_nothing (n G : ℕ) (hG : G ≤ 68) : ¬ (570 * n + 2273496 ≤ G) := by omega
 
-/-- Smallest cap certifiable for `n = 0` is `2273496` (≫ 68). -/
+/-- Smallest cap certifiable for `n = 0` via the round-7 constant is `2273496` (≫ 68).
+(With the sharper `BBPMu570b` constant the simple form is `570·n + 1795711`; not restated here.) -/
 theorem cap_certifiable_zero : (570 * 0 + 2273496 : ℕ) = 2273496 := rfl
 
 /-! ### The open gap, named -/

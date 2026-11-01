@@ -7,12 +7,14 @@ import Thoughts.Research.MahlerSharp7
 Plugs `MahlerSharp7.pi_pow16_measure7` (`μ = 570`, `C = 2^-9093942`) into the Round-5 logarithmic
 guard (`BBPGuardLog`).  Guard depth: `569·n + ⌊log₁₆(n+1)⌋ + 1 + 2273495`
 (Round 6: `657·n + ⌊log₁₆(n+1)⌋ + 1 + 430009`).
+Superseded by `BBPMu570b.lean` (Round 7b): additive constant `1795710`, simple form
+`570·n + 1795711`.
 -/
 
 namespace FinitistProved
 open Real
 
-/-- Round-6 constant `C = 2^-9093942`. -/
+/-- Round-7 constant `C = 2^-9093942`. -/
 noncomputable abbrev piC7 : ℝ := 1 / 2 ^ (9093941 + 1)
 
 theorem piC7_pos : 0 < piC7 := by unfold piC7; positivity

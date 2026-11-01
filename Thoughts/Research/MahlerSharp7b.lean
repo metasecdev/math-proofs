@@ -1,12 +1,14 @@
 import Thoughts.Research.MahlerSharp
 
 /-
-Research file (Thoughts/Research/MahlerSharp7b.lean). Round 7: μ 658 → 570.
+Research file (Thoughts/Research/MahlerSharp7b.lean). Round 7b: μ = 570 with the sharper constant
+`C = 2^-7182802` (round 7, `MahlerSharp7.lean`: `2^-9093942`; round 6: μ = 658, `2^-1720001`).
 * `psi_le_lin7`: ψ(x) ≤ (log 4 + 0.02)x + 8760  (round 6: +0.07, +1820), hence
   `lcm(1..n) ≤ exp(1.4063 n + 8760)`.
 * tail `r^J/J! ≤ (8.55/(m+1))^J` for `n ≥ 1000` (uses π·e < 8.5398; round 6: 9/(m+1)).
 * `log(n+1) ≤ (n+1)/2^17 − 1 + 17 log 2` (round 6: 2^-12).
-* specialization `m = 141`, `n = 4k + 12600`; see `research/round7/params7.py`.
+* specialization `m = 141`, `n = 4k + 12600`; see `research/round7b/params7b.py`.
+* result: `pi_pow16_measure7` below; guard constant `B = 1795710` in `BBPMu570b.lean`.
 -/
 
 set_option backward.isDefEq.respectTransparency false
@@ -61,7 +63,8 @@ namespace MahlerSharp7b
 open MahlerGeneral MahlerVanishing MahlerDet MahlerBounds MahlerMignotte MahlerRemainder MahlerSharp Finset
 
 
-/-- `r^J/J! ≤ (9/M)^J` for `r = (2n+1)π/2`, `J = n·M`, `n ≥ 10` (vs. `16/M` in round 4). -/
+/-- `r^J/J! ≤ (8.55/M)^J` for `r = (2n+1)π/2`, `J = n·M`, `n ≥ 1000`, `M ≥ 1`
+(round 6, `MahlerSharp.tail_le9`: `9/M` for `n ≥ 10`). -/
 lemma tail_le855 (n M : ℕ) (hn : 1000 ≤ n) (hM : 1 ≤ M) :
     ((2 * n + 1) * (Real.pi / 2)) ^ (n * M) / ((n * M).factorial : ℝ) ≤ (8.55 / (M : ℝ)) ^ (n * M) := by
   set J := n * M
@@ -98,7 +101,8 @@ lemma tail_le855 (n M : ℕ) (hn : 1000 ≤ n) (hM : 1 ≤ M) :
           nlinarith [mul_le_mul_of_nonneg_left hpe h2n]
         nlinarith
 
-/-- **Sharp remainder bound** (`n ≥ 10`). -/
+/-- **Sharp remainder bound** (`n ≥ 1000`; tail factor `8.55/(m+1)`, `lcm` bound
+`exp(1.4063 n + 8760)`). -/
 theorem remainder_sharp7 (n m h : ℕ) (hn : 1000 ≤ n) (hh : h ≤ m) :
     ‖(mahlerP n m : ℂ) * Uval n m h (Complex.I * (Real.pi / 2))‖ ≤
       (m : ℝ) ^ m * Real.exp (m * (1.4063 * n + 8760)) * ((m : ℝ) + 1) ^ m *
@@ -155,7 +159,7 @@ lemma log_3_le : Real.log 3 ≤ 2 * Real.log 2 := by
   have := Real.log_le_log (show (0:ℝ) < 3 by norm_num) (show (3:ℝ) ≤ 2 ^ 2 by norm_num)
   rw [Real.log_pow] at this; push_cast at this; linarith
 
-/-- `log(9/142) ≤ −4.16 log 2`, via `(9/142)^25 ≤ 2^-104`. -/
+/-- `log(8.55/142) ≤ −(81/20) log 2`, via `(8.55/142)^20 ≤ 2^-81`. -/
 lemma log_855_142_le : Real.log (8.55 / 142) ≤ -(81 / 20) * Real.log 2 := by
   have h : ((8.55 : ℝ) / 142) ^ 20 ≤ (2 ^ 81)⁻¹ := by norm_num
   have h2 := Real.log_le_log (by positivity) h
@@ -247,8 +251,8 @@ theorem T_spec7 (k : ℕ) :
         mul_le_mul_of_nonneg_left hl2.le hk0
       linarith
 
-/-- **Round-6 explicit irrationality measure for π at `q = 16^k`**:
-`|16^k π − p| · 16^(570 k) > 2^-1720001 · 16^k` for all `k ≥ 1`, `p ∈ ℤ`. -/
+/-- **Round-7b explicit irrationality measure for π at `q = 16^k`**:
+`|16^k π − p| · 16^(570 k) > 2^-7182802 · 16^k` for all `k ≥ 1`, `p ∈ ℤ`. -/
 theorem pi_pow16_measure7 :
     ∀ k : ℕ, 1 ≤ k → ∀ p : ℤ,
       |(16 : ℝ) ^ k * Real.pi - p| * (16 : ℝ) ^ (k * 570) > (1 / 2 ^ (7182801 + 1)) * (16 : ℝ) ^ k := by
