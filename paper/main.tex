@@ -114,7 +114,7 @@
 \keywords{$\pi$, Bailey--Borwein--Plouffe formula, digit extraction,
   irrationality measure, Lean~4, Mathlib, formal verification}
 
-\date{31 October 2026. Draft, not submitted.}
+\date{1 November 2026}
 
 \begin{abstract}
 We describe a Lean~4 development, built on Mathlib, about the
@@ -126,10 +126,9 @@ true digit. To remove the dependence on that check, we formalize an explicit
 irrationality-measure bound at the denominators $16^k$: for every $k\ge1$ and
 every integer $p$,
 $\abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k$.
-Our main theorem has two co-equal parts: for every $n\ge0$ the certificate
-returns $d_n$ at every guard depth
-$g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with $B=\Bconst$, and at every
-guard depth $g\ge 570n+\Bsimple$. We
+Our main theorem shows that for every $n\ge0$ the certificate returns $d_n$
+at every guard depth $g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with
+$B=\Bconst$; a simplified linear form of the guard is also proved. We
 also prove a short chain of exact statements relating the run of $0$s or
 $\mathrm{F}$s after position~$n$, the distance from $16^n\pi$ to the nearest
 integer, and the least sufficient guard depth. All statements are for every
@@ -153,7 +152,8 @@ that the rounding error cannot change the digit being extracted. How many extra
 digits are enough depends on how close $16^n\pi$ is to an integer, which is a
 Diophantine question about $\pi$.
 
-This paper reports a Lean~4~\cite{Mathlib2020} development that makes the
+This paper reports a Lean~4~\cite{Lean4} development, built on
+Mathlib~\cite{Mathlib2020}, that makes the
 guard explicit and proves it sufficient for every position. We use the
 following conventions throughout. For $n\in\N$ let
 \[
@@ -193,15 +193,10 @@ finite ranges of digits are labeled either as kernel-checked theorems or as
 computed numerics, and the latter are not used in any proof.
 
 \subsection*{Status of the capped certificate}
-The development also contains an earlier certificate that searches only the
-guard depths $4,8,\dots,64$ and falls back to $68$. It is proved incorrect on
-an explicit window near $2^{272}$. Kernel certificates for its correctness at
-$n\le 10000$ were checked by a local build on the author's MacBook Pro at
-commit \texttt{d8e418e} (GitHub's continuous-integration build does not
-build them), and correctness for $n\le2000$ is checked by continuous
-integration. The positions $10001\le n\le2^{272}-72$ are unchecked.
-Appendix~\ref{app:future} describes these results. They are not part of the
-main theorem.
+The development also contains an earlier capped certificate, which searches
+only a fixed set of guard depths; its checked ranges, the unchecked range and
+an explicit window where it is proved incorrect are described in
+Appendix~\ref{app:future}. It is not part of the main theorem.
 
 \section{Related work}\label{sec:related}
 
@@ -219,8 +214,10 @@ Theorem~\ref{thm:main}, which supplies, for every $n$, a guard depth at which
 the check is proved to pass.
 
 In Lean, Braams's lean-DLMF project~\cite{BraamsDLMF} contains the theorem
-\lean{hasSum_bbp_pi}, the BBP formula in Mathlib's \lean{HasSum} form. That
-file was first committed publicly on 16~October 2026. Our proof of
+\lean{hasSum_bbp_pi}, the BBP formula in Mathlib's \lean{HasSum} form, now in
+the file \texttt{DLMF/Constants/BBP.lean}. The theorem was first committed
+publicly on 16~October 2026, in the file \texttt{AAR/Constants/BBP.lean},
+which was renamed to its present path on 21~October 2026. Our proof of
 Theorem~\ref{thm:bbp} was developed independently and uses a different
 route (an integral representation, see Section~\ref{sec:bbp}). We do not claim
 priority for the identity.
@@ -239,14 +236,10 @@ every $k\ge1$.
 \subsection*{Other formal work}
 Mathlib~\cite{Mathlib2020} proves that $\pi$ is irrational, and Eberl's
 Isabelle formalization~\cite{EberlPiTranscendental} proves that $\pi$ is
-transcendental. The Prove2Me platform~\cite{Prove2MePi} hosts a campaign of
-Lean formulations of irrationality-measure bounds for $\pi$, from Mahler's
-exponent $42$ to the value $2$ claimed in a 2026 preprint; on 31~October 2026
-its campaign page listed all of these missions as completed. The goal
-statements we inspected there are in the form ``for every $\varepsilon>0$ there
-is a threshold $Q$'', which asserts the existence of a threshold without
-giving one. A guard depth needs a threshold and a constant that are explicit,
-so we do not use those results, and we have not audited them.
+transcendental. The Prove2Me platform~\cite{Prove2MePi} hosts Lean
+formulations of irrationality-measure bounds for $\pi$; the goal statements
+we inspected assert the existence of a threshold for every $\varepsilon>0$
+without giving explicit constants, so we do not use them.
 
 \section{The BBP identity}\label{sec:bbp}
 
@@ -283,7 +276,8 @@ For $k,N\in\N$ let
   \floor*{\frac{16^N}{16^k(8k+5)}}\monus
   \floor*{\frac{16^N}{16^k(8k+6)}},
 \]
-where $\monus$ is truncated subtraction on $\N$. For $n,g\in\N$ put
+where $\monus$ is truncated subtraction on $\N$, and the subtractions in
+$t_k(N)$ are grouped from the left. For $n,g\in\N$ put
 $K=n+g+1$ and
 \[
   \Sng=\sum_{k<K}t_k(n+g)\in\N,\qquad \Eng=4K+2,\qquad
@@ -303,7 +297,7 @@ that the truncated subtractions in $t_k(N)$ never truncate and that
   16^N a_k-1<t_k(N)<16^N a_k+3,
 \]
 where $a_k$ is the $k$-th summand of~\eqref{eq:bbp}. Summing over $k<K$ and
-bounding the tail of the series by $1$ gives
+bounding the tail of the series by less than $1$ gives
 \[
   \lo\le x_n<\hi+1\qquad(\text{\lean{bbpGuarded_bracket}}).
 \]
@@ -360,23 +354,23 @@ ingredients in the order in which they are combined.
 \begin{enumerate}
 \item \emph{Chebyshev bound.} From Mathlib's bound for the Chebyshev function
   $\psi$ and the estimate $2\sqrt{x}\log x\le 0.02x+8760$ for $x\ge1$ we
-  obtain $\psi(x)\le(\log4+0.02)x+8760$ (\lean{psi_le_lin7}), hence
+  obtain $\psi(x)\le(\log4+0.02)x+8760$ (\lean{LcmChebyshevSharp7b.psi_le_lin7}), hence
   $\operatorname{lcm}(1,\dots,n)\le\exp(1.4063\,n+8760)$
-  (\lean{lcm_le_exp_lin7}). Here $1.4063$ is a rational upper bound for
+  (\lean{LcmChebyshevSharp7b.lcm_le_exp_lin7}). Here $1.4063$ is a rational upper bound for
   $\log 4+0.02$.
 \item \emph{Remainder.} For $n\ge1000$ the auxiliary remainder terms satisfy a
-  tail bound of the form $(8.55/(m+1))^J$ (\lean{remainder_sharp7}); this uses
+  tail bound of the form $(8.55/(m+1))^J$ (\lean{MahlerSharp7b.remainder_sharp7}); this uses
   $\pi e<8.5398$. Specialized to $m=141$ and $n=4k+12600$, it gives the
   smallness hypothesis of the next step for every $h\le141$
-  (\lean{remainder_spec7}).
+  (\lean{MahlerSharp7b.remainder_spec7}).
 \item \emph{Mahler--Mignotte step.} A nonvanishing determinant argument
-  (\lean{pi_lower_bound_sharp}) shows that whenever $\abs{\pi-p/q}\le1$,
+  (\lean{MahlerSharp.pi_lower_bound_sharp}) shows that whenever $\abs{\pi-p/q}\le1$,
   \[
     1\le(2q)^{m}\,\abs{\pi-p/q}\;T,
   \]
   where $T$ collects the size of the auxiliary coefficients.
 \item \emph{Size of $T$.} With $m=141$ and $n=4k+12600$, the bound
-  $T\le2^{7182660+1716k}$ holds for every $k$ (\lean{T_spec7}).
+  $T\le2^{7182660+1716k}$ holds for every $k$ (\lean{MahlerSharp7b.T_spec7}).
 \item \emph{Exponent arithmetic.} With $q=16^k$ we have
   $(2q)^{141}=2^{141+564k}$, so
   $\abs{\pi-p/q}\ge2^{-(141+7182660)}\cdot2^{-(564+1716)k}$.
@@ -527,10 +521,9 @@ For every $n$, with $c_n=\lceil\log_{16}(8n+8\need(n)+12)\rceil$,
 \end{theorem}
 
 In Lean $c_n$ is \texttt{Nat.clog~16 (2~*~bbpGuardErr~n (piNeed~n))}, and
-$2E_{n,\need(n)}=8n+8\need(n)+12$. Both inequalities in
-Theorems~\ref{thm:distrun} and~\ref{thm:needbounds} are sharp in the sense
-that equality cannot occur in the strict ones: $16^k\dist_n\ne1$ because
-$\pi$ is irrational.
+$2E_{n,\need(n)}=8n+8\need(n)+12$. The inequalities in
+Theorem~\ref{thm:distrun} are strict: $16^k\dist_n\ne1$ for every $k$,
+because $\pi$ is irrational.
 
 \begin{theorem}[\lean{forced_chain}]\label{thm:chain}
 For every $n$:
@@ -702,7 +695,7 @@ and no \lean{sorry}, and the axiom audit \lean{Thoughts/AxiomsHeavy.lean}
 reports only \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
 (report \texttt{reports/heavy-certs-2026-10-31.md}). The same argument
 for $n\le2000$ (\lean{BBPSpigotDigitCorrect_of_le_2000_unconditional}) is
-checked in the default build.
+checked in the default build, which continuous integration runs.
 
 \begin{theorem}\label{thm:capwrong}
 For every $n$ with $2^{272}-71\le n$ and $5n+348\le14\cdot2^{272}$, the capped
@@ -731,7 +724,7 @@ unit, while the upper condition $5K+3\le14\cdot16^{68}$ keeps $\lo$ within the
 next lower integer; together they force $\lo\bmod16\ne d_n$
 (\lean{lo_digit_ne_of_window}). Below $2^{272}-71$ the bias is smaller than
 one unit, and whether the capped digit equals $d_n$ depends on the actual
-digits of $\pi$ after position $n$ (roughly, on a run of about
+digits of $\pi$ after position $n$ (heuristically, not proved: on a run of about
 $68-\log_{16}n$ zeros or $\mathrm{F}$s). These positions are unchecked.
 
 \subsection{Directions}
