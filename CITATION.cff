@@ -6,13 +6,18 @@ authors:
   - family-names: Taylor
     given-names: Brian Bernard
 version: "1.0.1"
-# date-released: set to the actual v1.0.1 tag date at release time
 date-released: "2026-11-01"
 # Code: Apache-2.0 (LICENSE). The paper text in paper/ is CC-BY-4.0.
 license: Apache-2.0
 repository-code: "https://github.com/metasecdev/math-proofs"
-# After Zenodo mints the DOI, add the concept DOI here:
-# doi: "10.5281/zenodo.XXXXXXX"
+doi: "10.5281/zenodo.23867087"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23867087"
+    description: "Concept DOI (all versions, resolves to the latest)"
+  - type: doi
+    value: "10.5281/zenodo.23867088"
+    description: "Version DOI for v1.0.1"
 keywords:
   - pi
   - BBP formula

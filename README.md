@@ -1,5 +1,7 @@
 # math-proofs
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23867087.svg)](https://doi.org/10.5281/zenodo.23867087)
+
 Lean 4 formalization of the Bailey–Borwein–Plouffe (BBP) formula for π and of
 guarded, finitely checkable certificates for the hexadecimal digits of π.
 
@@ -126,9 +128,13 @@ Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub shows it as "Cite
 Please cite the software as:
 
 > Brian Bernard Taylor. *A formally verified hexadecimal digit extraction for pi with an explicit
-> guard for every position (Lean 4 development)*, version 1.0.1. https://github.com/metasecdev/math-proofs
+> guard for every position (Lean 4 development)*, version 1.0.1. Zenodo.
+> https://doi.org/10.5281/zenodo.23867088
 
-A Zenodo DOI will be added here once the release is archived.
+The release is archived on Zenodo. The concept DOI
+[10.5281/zenodo.23867087](https://doi.org/10.5281/zenodo.23867087) always resolves to the latest
+version; the version DOI [10.5281/zenodo.23867088](https://doi.org/10.5281/zenodo.23867088) is
+v1.0.1 exactly.
 
 ## License
 
