@@ -4,7 +4,7 @@ import Thoughts.Research.BBPMu570Fixed
 /-!
 # Round 7b: unconditional all-`n` P-BBP-01, `μ = 570`, sharper additive constant
 
-Plugs `MahlerSharp7b.pi_pow16_measure7` (`μ = 570`, `C = 2^-7182802`) into the logarithmic guard
+Plugs `BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure` (`μ = 570`, `C = 2^-7182802`) into the logarithmic guard
 (`BBPGuardLog`).  Guard depth: `569·n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`
 (Round 7: `569·n + ⌊log₁₆(n+1)⌋ + 1 + 2273495`).  Simple form: every depth
 `g ≥ 570·n + 1795711` is correct (Round 7: `570·n + 2273496`).
@@ -18,7 +18,7 @@ noncomputable abbrev piC7b : ℝ := 1 / 2 ^ (7182801 + 1)
 
 theorem piC7b_pos : 0 < piC7b := by unfold piC7b; positivity
 
-theorem pi_pow16_measure_mu570b : PiPow16Measure 570 piC7b := MahlerSharp7b.pi_pow16_measure7
+theorem pi_pow16_measure_mu570b : PiPow16Measure 570 piC7b := BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure
 
 private lemma natLog16_mul_pow7b (c N e : ℕ) (hc1 : 16 ^ e ≤ c) (hc2 : c < 16 ^ (e + 1)) :
     Nat.log 16 (c * 16 ^ N) = N + e := by
@@ -53,20 +53,20 @@ theorem guardLogConst_570b : guardLogConst 570 piC7b = 1795710 := by
 
 /-- **Unconditional all-`n` P-BBP-01, Round 7b**: for every `n`, the guard agrees at depth
 `569·n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`. -/
-theorem bbp_guard_all_n_mu570b (n : ℕ) :
+theorem _root_.BBPPi.guardAgreesAt_guard570 (n : ℕ) :
     BBPGuardAgreesAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710) := by
   have h := pi_pow16_measure_guard_all_n'' piC7b_pos pi_pow16_measure_mu570b (by norm_num) n
   unfold gfun'' at h
   rwa [show 570 - 1 = 569 by norm_num, guardLogConst_570b] at h
 
-theorem bbp_digit_all_n_mu570b (n : ℕ) :
+theorem _root_.BBPPi.floor_digit_eq_guard570 (n : ℕ) :
     ⌊(16 : ℝ) ^ n * Real.pi⌋ =
         (bbpCertFloorAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710) : ℤ) ∧
       bbpCertDigitAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710) = bbpHexDigitReal n :=
-  ⟨(bbp_guard_all_n_mu570b n).floor_pi, (bbp_guard_all_n_mu570b n).digit_pi⟩
+  ⟨(BBPPi.guardAgreesAt_guard570 n).floor_pi, (BBPPi.guardAgreesAt_guard570 n).digit_pi⟩
 
 /-- every depth at or above the Round-7b guard is certified (monotonicity). -/
-theorem bbp_guard_mu570b_of_ge (n g : ℕ)
+theorem _root_.BBPPi.guardAgreesAt_of_guard570_le (n g : ℕ)
     (hg : 569 * n + (Nat.log 16 (n + 1) + 1) + 1795710 ≤ g) : BBPGuardAgreesAt n g := by
   have hspec := guardLogConst_spec (μ := 570) piC7b_pos
   rw [guardLogConst_570b] at hspec
@@ -83,22 +83,22 @@ private lemma log16_succ_le_7b (n : ℕ) : Nat.log 16 (n + 1) ≤ n := by
 
 /-- **P-BBP-01, fixed depth, Round 7b (simple form)**: for every `n` and every
 `g ≥ 570·n + 1795711`, the depth-`g` certificate gives π's floor and `n`-th hex digit. -/
-theorem bbp_digit_all_n_fixed7b (n g : ℕ) (hg : 570 * n + 1795711 ≤ g) :
+theorem _root_.BBPPi.bbpDigit_eq_of_guard_ge (n g : ℕ) (hg : 570 * n + 1795711 ≤ g) :
     ⌊(16 : ℝ) ^ n * Real.pi⌋ = (bbpCertFloorAt n g : ℤ) ∧
       bbpCertDigitAt n g = bbpHexDigitReal n := by
-  have h := bbp_guard_mu570b_of_ge n g (by have := log16_succ_le_7b n; omega)
+  have h := BBPPi.guardAgreesAt_of_guard570_le n g (by have := log16_succ_le_7b n; omega)
   exact ⟨h.floor_pi, h.digit_pi⟩
 
-theorem bbp_digit_all_n_at_G7b (n : ℕ) :
+theorem _root_.BBPPi.bbpDigit_eq_at_guard570_simple (n : ℕ) :
     bbpCertDigitAt n (570 * n + 1795711) = bbpHexDigitReal n :=
-  (bbp_digit_all_n_fixed7b n _ le_rfl).2
+  (BBPPi.bbpDigit_eq_of_guard_ge n _ le_rfl).2
 
 end FinitistProved
 
-#print axioms MahlerSharp7b.pi_pow16_measure7
+#print axioms BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure
 #print axioms FinitistProved.guardLogConst_570b
-#print axioms FinitistProved.bbp_guard_all_n_mu570b
-#print axioms FinitistProved.bbp_digit_all_n_mu570b
-#print axioms FinitistProved.bbp_guard_mu570b_of_ge
-#print axioms FinitistProved.bbp_digit_all_n_fixed7b
-#print axioms FinitistProved.bbp_digit_all_n_at_G7b
+#print axioms BBPPi.guardAgreesAt_guard570
+#print axioms BBPPi.floor_digit_eq_guard570
+#print axioms BBPPi.guardAgreesAt_of_guard570_le
+#print axioms BBPPi.bbpDigit_eq_of_guard_ge
+#print axioms BBPPi.bbpDigit_eq_at_guard570_simple

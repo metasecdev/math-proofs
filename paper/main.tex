@@ -335,7 +335,7 @@ to a lower bound for $\dist_n$.
 
 \section{An irrationality measure at the denominators \texorpdfstring{$16^k$}{16\^{}k}}\label{sec:measure}
 
-\begin{theorem}[\lean{MahlerSharp7b.pi_pow16_measure7}]\label{thm:measure}
+\begin{theorem}[\lean{BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure}]\label{thm:measure}
 For every integer $k\ge1$ and every $p\in\Z$,
 \[
   \abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k .
@@ -343,7 +343,7 @@ For every integer $k\ge1$ and every $p\in\Z$,
 \end{theorem}
 
 \begin{lstlisting}
-theorem pi_pow16_measure7 :
+theorem BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure :
     ∀ k : ℕ, 1 ≤ k → ∀ p : ℤ,
       |(16 : ℝ) ^ k * Real.pi - p| * (16 : ℝ) ^ (k * 570)
         > (1 / 2 ^ (7182801 + 1)) * (16 : ℝ) ^ k
@@ -405,8 +405,8 @@ depth that is sufficient for every $n$. Define
   g(n)=569n+\floor{\log_{16}(n+1)}+1+B,\qquad B=\Bconst .
 \]
 
-\begin{theorem}[main theorem; \lean{bbp_digit_all_n_mu570b},
-  \lean{bbp_digit_all_n_fixed7b}]\label{thm:main}
+\begin{theorem}[main theorem; \lean{BBPPi.floor_digit_eq_guard570},\\
+  \lean{BBPPi.bbpDigit_eq_of_guard_ge}]\label{thm:main}
 \leavevmode
 \begin{enumerate}
 \item \emph{Sharp form.} For every $n\in\N$ the guard agrees at depth
@@ -414,7 +414,7 @@ depth that is sufficient for every $n$. Define
     g(n)=569n+\floor{\log_{16}(n+1)}+1+\Bconst ,
   \]
   so $\floor{16^n\pi}=\lo(n,g(n))$ and $\lo(n,g(n))\bmod16=d_n$; the same
-  holds at every depth $g\ge g(n)$ (\lean{bbp_guard_mu570b_of_ge}).
+  holds at every depth $g\ge g(n)$ (\lean{BBPPi.guardAgreesAt_of_guard570_le}).
 \item \emph{Simplified form.} For all $n,g\in\N$ with $g\ge570n+\Bsimple$,
   the certificate at depth $g$ returns $\floor{16^n\pi}$ and $d_n$.
 \end{enumerate}
@@ -425,13 +425,13 @@ smaller depth; part~(2) has a simpler formula. Since
 $\floor{\log_{16}(n+1)}+1\le n+1$, we have $g(n)\le570n+\Bsimple$.
 
 \begin{lstlisting}
-theorem bbp_digit_all_n_mu570b (n : ℕ) :
+theorem BBPPi.floor_digit_eq_guard570 (n : ℕ) :
     ⌊(16 : ℝ) ^ n * Real.pi⌋ =
         (bbpCertFloorAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710) : ℤ) ∧
       bbpCertDigitAt n (569 * n + (Nat.log 16 (n + 1) + 1) + 1795710)
         = bbpHexDigitReal n
 
-theorem bbp_digit_all_n_fixed7b (n g : ℕ) (hg : 570 * n + 1795711 ≤ g) :
+theorem BBPPi.bbpDigit_eq_of_guard_ge (n g : ℕ) (hg : 570 * n + 1795711 ≤ g) :
     ⌊(16 : ℝ) ^ n * Real.pi⌋ = (bbpCertFloorAt n g : ℤ) ∧
       bbpCertDigitAt n g = bbpHexDigitReal n
 \end{lstlisting}
@@ -454,7 +454,7 @@ in $g$ and $\floor{\log_{16}(n+1)}\le n$.
 
 \begin{remark}[the exponent-$658$ guard]\label{rem:658}
 The earlier bound gives the guard
-$657n+\floor{\log_{16}(n+1)}+1+430009$ (\lean{bbp_digit_all_n_mu658}), also
+$657n+\floor{\log_{16}(n+1)}+1+430009$ (\lean{BBPPi.floor_digit_eq_guard658}), also
 proved for every $n$. It exceeds $g(n)$ by $88n-1365701$, so it is the smaller
 of the two for $n\le15519$ and the larger for $n\ge15520$. Both theorems
 hold for every $n$, so one can take the minimum.
@@ -578,8 +578,13 @@ $\mathrm{F}$-run that it lies just below one.
 \subsection*{Toolchain}
 The development uses Lean \lean{leanprover/lean4:v4.29.0-rc8} and Mathlib at
 commit \lean{816ff4582a01b10567d1d4ecb10be7c4ff92aab4}, as recorded in
-\lean{lake-manifest.json}. All proofs are in the namespace
-\lean{FinitistProved} unless another namespace is shown; the results of
+\lean{lake-manifest.json}. The headline theorems of
+Sections~\ref{sec:measure} and~\ref{sec:main} are in the namespace
+\lean{BBPPi} (their full names are shown); all other proofs are in the
+namespace \lean{FinitistProved} unless another namespace is shown. The
+earlier names of the renamed theorems (for example
+\lean{bbp_digit_all_n_mu570b}) remain as deprecated aliases in
+\lean{Thoughts/Deprecated.lean}. The results of
 Section~\ref{sec:structure} are in \lean{FinitistProved.PiDigitStructure},
 except the definition \lean{piGapSeq}, which is in
 \lean{Thoughts/Proved/BBPDigitDefs.lean}.
@@ -602,17 +607,18 @@ base, is not used.
 \subsection*{Theorem names}
 Table~\ref{tab:names} lists the Lean name and the file for each numbered
 result. All of them are on the \texttt{main} branch of the repository
-\texttt{metasecdev/math-proofs} (currently private) at commit
-\texttt{4a6b74c}, which contains only the BBP/$\pi$ development.
+\texttt{metasecdev/math-proofs} (currently private) at the release tag
+\texttt{v1.0.0}, which contains only the BBP/$\pi$ development.
 
 \begin{table}[ht]
 \centering
 \small
 \caption{Results and their Lean names in \texttt{metasecdev/math-proofs},
-branch \texttt{main}, commit \texttt{4a6b74c}. File paths are relative to
+release tag \texttt{v1.0.0}. File paths are relative to
 \texttt{Thoughts/}. Theorem~\ref{thm:cap10000} is in the separate Lake
 library \texttt{BBPHeavyCerts}, which GitHub CI does not build; it was
-checked by a local build on a MacBook Pro at commit \texttt{d8e418e}.}
+checked by a local build on a MacBook Pro at commit \texttt{d8e418e}; the
+modules it depends on are unchanged at \texttt{v1.0.0}.}
 \label{tab:names}
 \footnotesize
 \begin{tabular}{@{}>{\raggedright}p{0.12\textwidth} >{\raggedright}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
@@ -622,10 +628,10 @@ Result & Lean name & File\\
 Thm.~\ref{thm:bbp} & \lean{bbpSeries_eq_pi} & \lean{Proved/BBPPiIdentity.lean}\\
 Thm.~\ref{thm:sound} & \lean{BBPGuardAgreesAt.floor_pi}, \lean{BBPGuardAgreesAt.digit_pi} & \lean{Proved/BBPExplicitGuard.lean}\\
 Lem.~\ref{lem:dist} & \lean{guardAgreesAt_of_dist} & \lean{Research/BBPConditionalAllN.lean}\\
-Thm.~\ref{thm:measure} & \lean{MahlerSharp7b.pi_pow16_measure7} & \lean{Research/MahlerSharp7b.lean}\\
-Thm.~\ref{thm:main}(1) & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean}\\
-Thm.~\ref{thm:main}(2) & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean}\\
-Rem.~\ref{rem:658} & \lean{bbp_digit_all_n_mu658} & \lean{Research/BBPMu658.lean}\\
+Thm.~\ref{thm:measure} & \lean{BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure} & \lean{Research/MahlerSharp7b.lean}\\
+Thm.~\ref{thm:main}(1) & \lean{BBPPi.guardAgreesAt_guard570}, \lean{BBPPi.floor_digit_eq_guard570}, \lean{BBPPi.guardAgreesAt_of_guard570_le} & \lean{Research/BBPMu570b.lean}\\
+Thm.~\ref{thm:main}(2) & \lean{BBPPi.bbpDigit_eq_of_guard_ge} & \lean{Research/BBPMu570b.lean}\\
+Rem.~\ref{rem:658} & \lean{BBPPi.floor_digit_eq_guard658} & \lean{Research/BBPMu658.lean}\\
 Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lean}\\
 Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file\\
 Thm.~\ref{thm:chain} & \lean{forced_chain}, \lean{long_run_forces} & same file\\
@@ -652,9 +658,8 @@ integration builds the default target, which contains every result in
 Table~\ref{tab:names} except Theorem~\ref{thm:cap10000}, and runs the axiom
 check described above. The heavy certificates for Theorem~\ref{thm:cap10000}
 need more memory than hosted runners provide and are built separately
-(\texttt{lake build BBPHeavyCerts}). Before publication we plan to tag a
-single public commit and to rename the cited theorems to Mathlib style, with
-deprecated aliases for the names used here.
+(\texttt{lake build BBPHeavyCerts}). The version cited here is the
+annotated tag \texttt{v1.0.0}; the repository is private for now.
 
 \section*{Acknowledgements}
 The author used AI assistants (Grok Bot) as tools for drafting Lean proofs,

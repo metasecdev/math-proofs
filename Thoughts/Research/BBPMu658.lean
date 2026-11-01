@@ -52,21 +52,21 @@ theorem guardLogConst_658 : guardLogConst 658 piC6 = 430009 := by
 
 /-- **Unconditional all-`n` P-BBP-01, `μ = 658`**: for every `n`, the guard agrees at depth
 `657·n + ⌊log₁₆(n+1)⌋ + 1 + 430009`. -/
-theorem bbp_guard_all_n_mu658 (n : ℕ) :
+theorem _root_.BBPPi.guardAgreesAt_guard658 (n : ℕ) :
     BBPGuardAgreesAt n (657 * n + (Nat.log 16 (n + 1) + 1) + 430009) := by
   have h := pi_pow16_measure_guard_all_n'' piC6_pos pi_pow16_measure_mu658 (by norm_num) n
   unfold gfun'' at h
   rwa [show 658 - 1 = 657 by norm_num, guardLogConst_658] at h
 
-theorem bbp_digit_all_n_mu658 (n : ℕ) :
+theorem _root_.BBPPi.floor_digit_eq_guard658 (n : ℕ) :
     ⌊(16 : ℝ) ^ n * Real.pi⌋ =
         (bbpCertFloorAt n (657 * n + (Nat.log 16 (n + 1) + 1) + 430009) : ℤ) ∧
       bbpCertDigitAt n (657 * n + (Nat.log 16 (n + 1) + 1) + 430009) = bbpHexDigitReal n :=
-  ⟨(bbp_guard_all_n_mu658 n).floor_pi, (bbp_guard_all_n_mu658 n).digit_pi⟩
+  ⟨(BBPPi.guardAgreesAt_guard658 n).floor_pi, (BBPPi.guardAgreesAt_guard658 n).digit_pi⟩
 
 end FinitistProved
 
 #print axioms FinitistProved.pi_pow16_measure_mu658
 #print axioms FinitistProved.guardLogConst_658
-#print axioms FinitistProved.bbp_guard_all_n_mu658
-#print axioms FinitistProved.bbp_digit_all_n_mu658
+#print axioms BBPPi.guardAgreesAt_guard658
+#print axioms BBPPi.floor_digit_eq_guard658

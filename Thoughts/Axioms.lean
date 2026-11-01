@@ -13,6 +13,9 @@ target contains. The heavy capped certificate for `n ≤ 10000` is in `Thoughts/
 (library `BBPHeavyCerts`, not built by GitHub CI; checked by a local build on the MacBookPro at
 `d8e418e`, see `reports/heavy-certs-2026-10-31.md`). Add new headline theorems here when they are
 imported into `Thoughts.lean`.
+
+The headline theorems are named in the namespace `BBPPi`; their earlier names are deprecated
+aliases in `Thoughts/Deprecated.lean`.
 -/
 
 /-! ## Paper, Table 2 (default target) -/
@@ -25,13 +28,17 @@ imported into `Thoughts.lean`.
 -- Sec. 4: distance criterion
 #print axioms FinitistProved.guardAgreesAt_of_dist
 -- Sec. 5: irrationality measure of π at `16^k` (μ = 570, C = 2^-7182802)
-#print axioms MahlerSharp7b.pi_pow16_measure7
--- Sec. 6: main theorem (B = 1795710; simple form 570·n + 1795711)
-#print axioms FinitistProved.bbp_digit_all_n_fixed7b
-#print axioms FinitistProved.bbp_digit_all_n_mu570b
-#print axioms FinitistProved.bbp_guard_mu570b_of_ge
+#print axioms BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure
+-- Sec. 6: main theorem, part (1) sharp form (B = 1795710)
+#print axioms BBPPi.guardAgreesAt_guard570
+#print axioms BBPPi.floor_digit_eq_guard570
+#print axioms BBPPi.guardAgreesAt_of_guard570_le
+-- Sec. 6: main theorem, part (2) simplified form (570·n + 1795711)
+#print axioms BBPPi.bbpDigit_eq_of_guard_ge
+#print axioms BBPPi.bbpDigit_eq_at_guard570_simple
 -- Sec. 6: the exponent-658 guard (remark)
-#print axioms FinitistProved.bbp_digit_all_n_mu658
+#print axioms BBPPi.guardAgreesAt_guard658
+#print axioms BBPPi.floor_digit_eq_guard658
 -- Sec 7: runs, distance and need
 #print axioms FinitistProved.PiDigitStructure.piDist_run
 #print axioms FinitistProved.PiDigitStructure.piNeed_bounds
@@ -49,7 +56,7 @@ imported into `Thoughts.lean`.
 #print axioms FinitistProved.bbpPiEqualsSeries_proved
 #print axioms FinitistProved.BBPSpigotDigitCorrect_of_guard
 #print axioms FinitistProved.BBPSpigotDigitCorrect_of_le_2000_unconditional
-#print axioms FinitistProved.bbp_explicit_guard_all_n
+#print axioms BBPPi.exists_guard_floor_digit_eq
 -- earlier irrationality measures at `16^k` and the explicit guards they give
 #print axioms MahlerPiMeasure.pi_pow16_measure
 #print axioms MahlerSharp.pi_pow16_measure6
@@ -62,7 +69,6 @@ imported into `Thoughts.lean`.
 #print axioms FinitistProved.bbp_digit_all_n_simple
 #print axioms FinitistProved.bbp_digit_all_n_fixed
 #print axioms FinitistProved.bbp_digit_all_n_at_G
-#print axioms FinitistProved.bbp_digit_all_n_at_G7b
 -- capped-certificate analysis: fast checker soundness, refutation of the capped statement
 #print axioms FinitistProved.chkFrom_sound
 #print axioms FinitistProved.not_PBBP01General

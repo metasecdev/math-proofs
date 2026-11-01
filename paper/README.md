@@ -30,7 +30,7 @@ the listings use DejaVu Sans Mono for the Lean symbols. A standard `latexmk -xel
 ## Lean sources
 
 The Lean code is in this repository, `metasecdev/math-proofs` (private), on branch `main`.
-Table 2 of the paper cites commit `4a6b74c`, using paths relative to `Thoughts/`. The toolchain is
+Table 2 of the paper cites the release tag `v1.0.0`, using paths relative to `Thoughts/`. The toolchain is
 `leanprover/lean4:v4.29.0-rc8`, with Mathlib `816ff4582a01b10567d1d4ecb10be7c4ff92aab4` pinned
 in both `lakefile.lean` and `lake-manifest.json`.
 

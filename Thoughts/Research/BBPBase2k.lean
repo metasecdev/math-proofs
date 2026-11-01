@@ -4,7 +4,7 @@ import Thoughts.Research.BBPMu658
 # Round 6: base-`2^j` digits of π from the hex certificate (all positions)
 
 `⌊2^N π⌋ = ⌊16^M π⌋ / 2^(4M−N)` with `M = ⌈N/4⌉`, so the unconditional hex certificate
-(`bbp_digit_all_n_mu658`) also certifies every binary digit, hence every digit in base
+(`BBPPi.floor_digit_eq_guard658`) also certifies every binary digit, hence every digit in base
 `2, 4, 8, 16` (and any `2^j`: the base-`2^j` digit at position `n` is `⌊2^{jn} π⌋ mod 2^j`).
 -/
 
@@ -30,7 +30,7 @@ theorem bbp_floor_two_pow_all_N (N : ℕ) :
       (bbpCertFloorAt ((N + 3) / 4)
           (657 * ((N + 3) / 4) + (Nat.log 16 ((N + 3) / 4 + 1) + 1) + 430009) : ℤ) /
         ((2 ^ (4 * ((N + 3) / 4) - N) : ℕ) : ℤ) := by
-  rw [floor_two_pow_mul_pi, (bbp_digit_all_n_mu658 ((N + 3) / 4)).1]
+  rw [floor_two_pow_mul_pi, (BBPPi.floor_digit_eq_guard658 ((N + 3) / 4)).1]
 
 /-- base-`2^j` digit at position `n`: `⌊(2^j)^n π⌋ mod 2^j`. -/
 noncomputable def pow2DigitReal (j n : ℕ) : ℤ := ⌊(2 : ℝ) ^ (j * n) * Real.pi⌋ % 2 ^ j
