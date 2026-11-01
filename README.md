@@ -7,6 +7,8 @@ guarded, finitely checkable certificates for the hexadecimal digits of π.
 
 **Author:** Brian Bernard Taylor (sole author).
 
+**Plain-language overview:** [You Can Compute a Hex Digit of π Without the Ones Before It. How Do You Know It's Right?](https://medium.com/@metasecdev/you-can-compute-a-hex-digit-of-%CF%80-without-the-ones-before-it-how-do-you-know-its-right-92b0106824e7) (Medium, Nov 2026)
+
 ## Scope
 
 This repository contains only the BBP / π work. In particular:
