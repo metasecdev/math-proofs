@@ -119,3 +119,20 @@ python3 scripts/check_axioms.py axioms-heavy.log
 ```
 
 The default build covers everything else, including n ≤ 2000.
+
+## How to cite
+
+Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub shows it as "Cite this repository").
+Please cite the software as:
+
+> Brian Bernard Taylor. *A formally verified hexadecimal digit extraction for pi with an explicit
+> guard for every position (Lean 4 development)*, version 1.0.1. https://github.com/metasecdev/math-proofs
+
+A Zenodo DOI will be added here once the release is archived.
+
+## License
+
+* Code (Lean sources, scripts, CI and everything outside `paper/`): Apache License 2.0, see
+  [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Copyright 2026 Brian Bernard Taylor.
+* Paper (`paper/`): the text is licensed under CC BY 4.0, see
+  [`paper/LICENSE-CC-BY-4.0`](paper/LICENSE-CC-BY-4.0).
