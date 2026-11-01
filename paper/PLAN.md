@@ -12,7 +12,7 @@ private until Brian decides otherwise.
 | 4. One tagged commit | Open: Table 2 cites `main` at `4a6b74c`; the tag is still to come |
 | 5. Docstrings | Done for the stale constants (PR #6); the internal jargon is not yet removed |
 | 6. Names | Open: no renames yet |
-| 7. CI axiom report | Done for the default build (`Thoughts/Axioms.lean`, `axioms-report` artifact). The heavy `n ≤ 10000` certificates are pending a heavy build (`Thoughts/AxiomsHeavy.lean`) |
+| 7. CI axiom report | Done for the default build (`Thoughts/Axioms.lean`, `axioms-report` artifact). The heavy `n ≤ 10000` certificates are not built by GitHub CI; they were checked by a local build on the MacBookPro at `d8e418e` (`Thoughts/AxiomsHeavy.lean`, `reports/heavy-certs-2026-10-31.md`) |
 | 8. README | Done: root `README.md`, with a theorem table |
 
 The original plan follows.

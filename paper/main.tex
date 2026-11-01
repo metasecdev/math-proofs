@@ -193,9 +193,10 @@ computed numerics, and the latter are not used in any proof.
 The development also contains an earlier certificate that searches only the
 guard depths $4,8,\dots,64$ and falls back to $68$. It is proved incorrect on
 an explicit window near $2^{272}$. Kernel certificates for its correctness at
-$n\le 10000$ are written; their check is pending a heavy build (it is not part
-of the continuous-integration build), and correctness for $n\le2000$ is
-checked. The positions $10001\le n\le2^{272}-72$ are unchecked.
+$n\le 10000$ were checked by a local build on the author's MacBook Pro at
+commit \texttt{d8e418e} (GitHub's continuous-integration build does not
+build them), and correctness for $n\le2000$ is checked by continuous
+integration. The positions $10001\le n\le2^{272}-72$ are unchecked.
 Appendix~\ref{app:future} describes these results. They are not part of the
 main theorem.
 
@@ -605,7 +606,8 @@ result. All of them are on the \texttt{main} branch of the repository
 \caption{Results and their Lean names in \texttt{metasecdev/math-proofs},
 branch \texttt{main}, commit \texttt{4a6b74c}. File paths are relative to
 \texttt{Thoughts/}. Theorem~\ref{thm:cap10000} is in the separate Lake
-library \texttt{BBPHeavyCerts}; its check is pending a heavy build.}
+library \texttt{BBPHeavyCerts}, which GitHub CI does not build; it was
+checked by a local build on a MacBook Pro at commit \texttt{d8e418e}.}
 \label{tab:names}
 \footnotesize
 \begin{tabular}{@{}>{\raggedright}p{0.12\textwidth} >{\raggedright}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
@@ -623,7 +625,7 @@ Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lea
 Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file\\
 Thm.~\ref{thm:chain} & \lean{forced_chain}, \lean{long_run_forces} & same file\\
 Prop.~\ref{prop:converse} & \lean{long_gap_short_run}, \lean{cert_78_127} & same file\\
-Thm.~\ref{thm:cap10000} & \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional} & \lean{Proved/BBPDigitsUnconditionalExt10000.lean} (pending)\\
+Thm.~\ref{thm:cap10000} & \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional} & \lean{Proved/BBPDigitsUnconditionalExt10000.lean} (local build, \texttt{d8e418e})\\
 Thm.~\ref{thm:capwrong} & \lean{not_BBPSpigotDigitCorrect_window'}, \lean{not_BBPSpigotDigitCorrect_window} & \lean{Research/BBPCapBracket.lean}, \lean{Research/BBPCapRefutation.lean}\\
 \bottomrule
 \end{tabular}
@@ -671,7 +673,7 @@ what happens at the positions where no depth up to $64$ agrees.
 
 \subsection{What is proved}
 
-\begin{theorem}[check pending a heavy build]\label{thm:cap10000}
+\begin{theorem}[checked by a local build]\label{thm:cap10000}
 For every $n\le10000$ the capped certificate returns $d_n$.
 \end{theorem}
 
@@ -683,9 +685,12 @@ at the depth the search selects; it then applies Theorem~\ref{thm:sound}.
 The bound $10000$ reflects the cost of the check, not a mathematical limit.
 
 This kernel check needs more than $10$\,GB of memory per Lean process, so it
-is not part of the continuous-integration build. Its check is pending a heavy
-build; we list Theorem~\ref{thm:cap10000} as pending until that build and the
-axiom audit \lean{Thoughts/AxiomsHeavy.lean} have passed. The same argument
+is not part of the GitHub continuous-integration build. It was checked by a
+local build of \texttt{BBPHeavyCerts} on a MacBook Pro (Intel Core i9-9980HK,
+64\,GB) at commit \texttt{d8e418e} on 31 October 2026: the build had no errors
+and no \lean{sorry}, and the axiom audit \lean{Thoughts/AxiomsHeavy.lean}
+reports only \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
+(report \texttt{reports/heavy-certs-2026-10-31.md}). The same argument
 for $n\le2000$ (\lean{BBPSpigotDigitCorrect_of_le_2000_unconditional}) is
 checked in the default build.
 
@@ -729,8 +734,8 @@ $68-\log_{16}n$ zeros or $\mathrm{F}$s). These positions are unchecked.
   column of Table~\ref{tab:guard} could be turned into kernel-checked
   statements for explicit ranges, using Theorem~\ref{thm:needbounds} and the
   decidable check.
-\item \emph{The heavy certificates.} Complete the heavy build for
-  Theorem~\ref{thm:cap10000} and extend the kernel-checked range of the
+\item \emph{The heavy certificates.} Run the heavy build for
+  Theorem~\ref{thm:cap10000} in automated checking, and extend the kernel-checked range of the
   capped certificate beyond $n=10000$.
 \end{enumerate}
 

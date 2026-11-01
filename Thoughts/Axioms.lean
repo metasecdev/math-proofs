@@ -10,7 +10,8 @@ and `scripts/check_axioms.py` fails the job unless every result below lists only
 
 The first block is exactly the list of results in Table 2 of `paper/main.tex` that the default
 target contains. The heavy capped certificate for `n ≤ 10000` is in `Thoughts/AxiomsHeavy.lean`
-(library `BBPHeavyCerts`, not built by CI). Add new headline theorems here when they are
+(library `BBPHeavyCerts`, not built by GitHub CI; checked by a local build on the MacBookPro at
+`d8e418e`, see `reports/heavy-certs-2026-10-31.md`). Add new headline theorems here when they are
 imported into `Thoughts.lean`.
 -/
 

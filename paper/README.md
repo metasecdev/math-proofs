@@ -41,8 +41,9 @@ in both `lakefile.lean` and `lake-manifest.json`.
 - Capped certificate (Appendix A): the window near 2^272 is in
   `Thoughts/Research/BBPCapBracket.lean` and `Thoughts/Research/BBPCapRefutation.lean`.
   The `n ≤ 10000` certificates are in `Thoughts/Proved/BBPDigitsUnconditionalExt10000.lean`, in the
-  Lake library `BBPHeavyCerts`. CI does not build that library, and **its check is pending a
-  heavy build** (`lake build BBPHeavyCerts`, then `Thoughts/AxiomsHeavy.lean`).
+  Lake library `BBPHeavyCerts`. GitHub CI does not build that library. It was **checked by a local build on the MacBookPro at
+  `d8e418e`** (`lake build BBPHeavyCerts`, then `Thoughts/AxiomsHeavy.lean`; only `propext`,
+  `Classical.choice`, `Quot.sound`); see `reports/heavy-certs-2026-10-31.md`.
   The positions 10001 ≤ n ≤ 2^272 − 72 are unchecked.
 - Axioms: `Thoughts/Axioms.lean` prints the axioms of every Table 2 result that is in the
   default build. The `Lean CI` workflow runs it and gates it with `scripts/check_axioms.py`
