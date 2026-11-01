@@ -13,7 +13,7 @@
   Proved unconditionally (H-04 = `bbpSeries_eq_pi`, no hypotheses):
   * soundness: `BBPGuardAgreesAt n g → ⌊16^n·π⌋ = bbpCertFloorAt n g` and
     `bbpCertDigitAt n g = bbpHexDigitReal n` (the `n`-th hex digit, `d_0 = 3`);
-  * `bbp_explicit_guard_all_n : ∀ n, ∃ g, BBPGuardAgreesAt n g ∧ floor ∧ digit` (from
+  * `BBPPi.exists_guard_floor_digit_eq : ∀ n, ∃ g, BBPGuardAgreesAt n g ∧ floor ∧ digit` (from
     `exists_guard_agrees`, which uses `irrational_pi`);
   * the capped certificate is the special case `g = bbpCertGuard n`
     (`bbpGuardAgrees_iff_at`, `bbpCertFloor_eq_at`, `bbpHexDigitCert_eq_at`), and the old
@@ -22,9 +22,9 @@
   NOT proved, and not claimed:
   * In THIS file the `g` of the all-`n` theorem is existential. Explicit linear bounds are proved
     elsewhere from explicit irrationality measures of π at `q = 16^k`:
-    `Research/BBPMu570b.lean` (`bbp_digit_all_n_mu570b`: depth `569·n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`;
-    `bbp_digit_all_n_fixed7b`: every `g ≥ 570·n + 1795711`), from
-    `MahlerSharp7b.pi_pow16_measure7`; earlier `BBPMu658.lean`, `BBPMu570.lean`.
+    `Research/BBPMu570b.lean` (`BBPPi.floor_digit_eq_guard570`: depth `569·n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`;
+    `BBPPi.bbpDigit_eq_of_guard_ge`: every `g ≥ 570·n + 1795711`), from
+    `BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure`; earlier `BBPMu658.lean`, `BBPMu570.lean`.
     The least sufficient depth is governed by the run of hex `0`s / `F`s of π after position `n`
     (`Research/PiDigitStructure.lean`, `piNeed_bounds`).
   * Nothing about normality of π.
@@ -116,7 +116,7 @@ theorem certFloorAt_eq_of_agree {n g g' : ℕ} (h : BBPGuardAgreesAt n g)
 the bracket ends agree at `g`, the certificate floor is `⌊16^n·π⌋`, and the certificate digit is
 the true `n`-th hex digit of π. The depth `g` is existential — no bound in terms of `n` is
 proved (that would need an effective irrationality measure of π). -/
-theorem bbp_explicit_guard_all_n (n : ℕ) :
+theorem _root_.BBPPi.exists_guard_floor_digit_eq (n : ℕ) :
     ∃ g : ℕ, BBPGuardAgreesAt n g ∧ ⌊(16 : ℝ) ^ n * Real.pi⌋ = (bbpCertFloorAt n g : ℤ) ∧
       bbpCertDigitAt n g = bbpHexDigitReal n := by
   obtain ⟨g, hg⟩ := exists_guard_agrees n
@@ -125,11 +125,11 @@ theorem bbp_explicit_guard_all_n (n : ℕ) :
 
 theorem bbp_explicit_guard_all_n' : ∀ n : ℕ, ∃ g : ℕ, BBPGuardAgreesAt n g ∧
     ⌊(16 : ℝ) ^ n * Real.pi⌋ = (bbpCertFloorAt n g : ℤ) ∧ bbpCertDigitAt n g = bbpHexDigitReal n :=
-  bbp_explicit_guard_all_n
+  BBPPi.exists_guard_floor_digit_eq
 
 /-- The explicit-guard form of P-BBP-01 holds for all `n` (existential `g`). -/
 theorem PBBP01ExplicitGuard_proved : PBBP01ExplicitGuard := fun n => by
-  obtain ⟨g, h, -, hd⟩ := bbp_explicit_guard_all_n n
+  obtain ⟨g, h, -, hd⟩ := BBPPi.exists_guard_floor_digit_eq n
   exact ⟨g, h, hd⟩
 
 /-! ### (c) Decidable check; relation to the capped certificate -/

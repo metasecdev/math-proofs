@@ -11,6 +11,9 @@ Run on a large machine:
     python3 scripts/check_axioms.py axioms-heavy.log
 
 Paper, Table 2, Appendix A (capped certificate correct for every `n ≤ 10000`).
+
+These names were deliberately not moved to the namespace `BBPPi` (see `Thoughts/Deprecated.lean`):
+renaming them would change the heavy modules, which would then need another local build.
 -/
 
 #print axioms FinitistProved.bbpGuardAgrees_of_lt_10001

@@ -1,6 +1,6 @@
 # Plan: clean public Lean snapshot for the BBP/π paper
 
-Status as of 31 October 2026. The plan is being carried out in `metasecdev/math-proofs` itself, which
+Status as of 1 November 2026. The plan is being carried out in `metasecdev/math-proofs` itself, which
 holds only the BBP/π development, rather than in a separate snapshot repository. The repository stays
 private until Brian decides otherwise.
 
@@ -9,9 +9,9 @@ private until Brian decides otherwise.
 | 1. Separate repository | Done: `metasecdev/math-proofs` |
 | 2. Cut unrelated imports | Done: the closures of the cited theorems contain only BBP/π modules |
 | 3. Pin dependencies | Done: Mathlib pinned in `lakefile.lean`; there is no duplicate `lakefile.toml` |
-| 4. One tagged commit | Open: Table 2 cites `main` at `4a6b74c`; the tag is still to come |
+| 4. One tagged commit | Done: annotated tag `v1.0.0` on `main` (private GitHub release); Table 2 cites `v1.0.0` |
 | 5. Docstrings | Done for the stale constants (PR #6); the internal jargon is not yet removed |
-| 6. Names | Open: no renames yet |
+| 6. Names | Done: headline theorems renamed into the namespace `BBPPi` (e.g. `BBPPi.bbpDigit_eq_of_guard_ge`, `BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure`); old names are deprecated aliases in `Thoughts/Deprecated.lean`; heavy-certificate names unchanged |
 | 7. CI axiom report | Done for the default build (`Thoughts/Axioms.lean`, `axioms-report` artifact). The heavy `n ≤ 10000` certificates are not built by GitHub CI; they were checked by a local build on the MacBookPro at `d8e418e` (`Thoughts/AxiomsHeavy.lean`, `reports/heavy-certs-2026-10-31.md`) |
 | 8. README | Done: root `README.md`, with a theorem table |
 

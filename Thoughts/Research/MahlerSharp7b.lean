@@ -8,7 +8,7 @@ Research file (Thoughts/Research/MahlerSharp7b.lean). Round 7b: μ = 570 with th
 * tail `r^J/J! ≤ (8.55/(m+1))^J` for `n ≥ 1000` (uses π·e < 8.5398; round 6: 9/(m+1)).
 * `log(n+1) ≤ (n+1)/2^17 − 1 + 17 log 2` (round 6: 2^-12).
 * specialization `m = 141`, `n = 4k + 12600`; see `research/round7b/params7b.py`.
-* result: `pi_pow16_measure7` below; guard constant `B = 1795710` in `BBPMu570b.lean`.
+* result: `BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure` below; guard constant `B = 1795710` in `BBPMu570b.lean`.
 -/
 
 set_option backward.isDefEq.respectTransparency false
@@ -253,7 +253,7 @@ theorem T_spec7 (k : ℕ) :
 
 /-- **Round-7b explicit irrationality measure for π at `q = 16^k`**:
 `|16^k π − p| · 16^(570 k) > 2^-7182802 · 16^k` for all `k ≥ 1`, `p ∈ ℤ`. -/
-theorem pi_pow16_measure7 :
+theorem _root_.BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure :
     ∀ k : ℕ, 1 ≤ k → ∀ p : ℤ,
       |(16 : ℝ) ^ k * Real.pi - p| * (16 : ℝ) ^ (k * 570) > (1 / 2 ^ (7182801 + 1)) * (16 : ℝ) ^ k := by
   intro k hk p
@@ -313,4 +313,4 @@ theorem pi_pow16_measure7 :
 end MahlerSharp7b
 
 #print axioms LcmChebyshevSharp7b.lcm_le_exp_lin7
-#print axioms MahlerSharp7b.pi_pow16_measure7
+#print axioms BBPPi.MahlerSharp7b.pi_pow16_irrationality_measure
