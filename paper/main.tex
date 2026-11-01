@@ -580,8 +580,9 @@ except the definition \lean{piGapSeq}, which is in
 
 \subsection*{Axioms and decision procedures}
 For each theorem in Table~\ref{tab:names}, \mbox{\texttt{\#print axioms}} reports no
-axioms beyond \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound};
-in particular there is no \lean{sorryAx}. The file
+axioms beyond \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
+(\lean{cert_78_127} uses only \lean{propext}); in particular there is no
+\lean{sorryAx}. The file
 \lean{Thoughts/Axioms.lean} runs \mbox{\texttt{\#print axioms}} on every theorem
 in the table that is in the default build, and the repository's
 continuous-integration job fails if any other axiom, any \lean{sorry}, or
