@@ -44,7 +44,8 @@ theorem BBPSpigotDigitCorrect_of_le_300_unconditional (n : ℕ) (hn : n ≤ 300)
   BBPSpigotDigitCorrect_of_le_300 bbpPiEqualsSeries_proved n hn
 
 /-- Reduction only: P-BBP-01 for all `n` follows from the guard check at all `n`
-(the guard is verified only for `n ≤ 300`, so this does NOT prove general `n`). -/
+(the hypothesis is false as stated: `not_forall_bbpGuardAgrees` in `BBPGuardCap.lean`, so this
+does NOT prove general `n`; `PBBP01General` itself is refuted by `not_PBBP01General`). -/
 theorem PBBP01General_of_guard_unconditional (h : ∀ n, bbpGuardAgrees n) :
     PBBP01General :=
   PBBP01General_of_guard bbpPiEqualsSeries_proved h
