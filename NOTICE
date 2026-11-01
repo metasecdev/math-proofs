@@ -1,0 +1,7 @@
+math-proofs
+Copyright 2026 Brian Bernard Taylor
+
+The Lean code, scripts and other files in this repository are licensed under the
+Apache License, Version 2.0 (see LICENSE), except the paper in paper/, whose text is
+licensed under the Creative Commons Attribution 4.0 International License
+(see paper/LICENSE-CC-BY-4.0).

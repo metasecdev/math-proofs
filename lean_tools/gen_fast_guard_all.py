@@ -37,8 +37,10 @@ def write_modules(A, B, gs):
 
 if __name__ == "__main__":
     A, B, P = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-    cache = f"/workspace/fast_g_{A}_{B}.json"
-    full = "/workspace/fast_g_0_10001.json"
+    # Cache directory for computed guard lists (default: current directory; override with FAST_G_CACHE_DIR).
+    cache_dir = os.environ.get("FAST_G_CACHE_DIR", ".")
+    cache = os.path.join(cache_dir, f"fast_g_{A}_{B}.json")
+    full = os.path.join(cache_dir, "fast_g_0_10001.json")
     if not os.path.exists(cache) and os.path.exists(full) and B <= 10001:
         json.dump(json.load(open(full))[A:B], open(cache, "w"))
     if os.path.exists(cache):
