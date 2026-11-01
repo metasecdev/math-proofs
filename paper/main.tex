@@ -600,18 +600,18 @@ base, is not used.
 \subsection*{Theorem names}
 Table~\ref{tab:names} lists the Lean name and the file for each numbered
 result. All of them are on the \texttt{main} branch of the repository
-\texttt{metasecdev/math-proofs} (currently private) at the release tag
-\texttt{v1.0.0}, which contains only the BBP/$\pi$ development.
+\texttt{metasecdev/math-proofs}~\cite{MathProofsSoftware} at the release tag
+\texttt{v1.0.1}, which contains only the BBP/$\pi$ development.
 
 \begin{table}[ht]
 \centering
 \small
 \caption{Results and their Lean names in \texttt{metasecdev/math-proofs},
-release tag \texttt{v1.0.0}. File paths are relative to
+release tag \texttt{v1.0.1}. File paths are relative to
 \texttt{Thoughts/}. Theorem~\ref{thm:cap10000} is in the separate Lake
 library \texttt{BBPHeavyCerts}, which GitHub CI does not build; it was
 checked by a local build on a MacBook Pro at commit \texttt{d8e418e}; the
-modules it depends on are unchanged at \texttt{v1.0.0}.}
+modules it depends on are unchanged at \texttt{v1.0.1}.}
 \label{tab:names}
 \footnotesize
 \begin{tabular}{@{}>{\raggedright}p{0.12\textwidth} >{\raggedright}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
@@ -652,7 +652,11 @@ Table~\ref{tab:names} except Theorem~\ref{thm:cap10000}, and runs the axiom
 check described above. The heavy certificates for Theorem~\ref{thm:cap10000}
 need more memory than hosted runners provide and are built separately
 (\texttt{lake build BBPHeavyCerts}). The version cited here is the
-annotated tag \texttt{v1.0.0}; the repository is private for now.
+annotated tag \texttt{v1.0.1}, archived on Zenodo with DOI
+\href{https://doi.org/10.5281/zenodo.23867088}{\texttt{10.5281/zenodo.23867088}}
+(concept DOI for all versions:
+\href{https://doi.org/10.5281/zenodo.23867087}{\texttt{10.5281/zenodo.23867087}})~\cite{MathProofsSoftware}.
+Its Lean sources are the same as at the earlier tag \texttt{v1.0.0}.
 
 \section*{Acknowledgements}
 The author used AI assistants (Grok Bot) as tools for drafting Lean proofs,
