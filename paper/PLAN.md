@@ -1,6 +1,21 @@
-# Plan: clean public Lean snapshot for the BBP/π paper (NOT executed)
+# Plan: clean public Lean snapshot for the BBP/π paper
 
-Nothing here has been done. The repository stays private until Brian decides otherwise.
+Status as of 31 October 2026. The plan is being carried out in `metasecdev/math-proofs` itself, which
+holds only the BBP/π development, rather than in a separate snapshot repository. The repository stays
+private until Brian decides otherwise.
+
+| Step | Status |
+|---|---|
+| 1. Separate repository | Done: `metasecdev/math-proofs` |
+| 2. Cut unrelated imports | Done: the closures of the cited theorems contain only BBP/π modules |
+| 3. Pin dependencies | Done: Mathlib pinned in `lakefile.lean`; there is no duplicate `lakefile.toml` |
+| 4. One tagged commit | Open: Table 2 cites `main` at `4a6b74c`; the tag is still to come |
+| 5. Docstrings | Done for the stale constants (PR #6); the internal jargon is not yet removed |
+| 6. Names | Open: no renames yet |
+| 7. CI axiom report | Done for the default build (`Thoughts/Axioms.lean`, `axioms-report` artifact). The heavy `n ≤ 10000` certificates are pending a heavy build (`Thoughts/AxiomsHeavy.lean`) |
+| 8. README | Done: root `README.md`, with a theorem table |
+
+The original plan follows.
 
 1. **New repository or folder.** Create a fresh repository (e.g. `bbp-pi-lean`) that holds only
    the modules the paper needs: `BBPAlgebra`, `BBPSeries`, `BBPTail`, `BBPGuarded`,

@@ -6,6 +6,14 @@
 \usepackage{array}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{listings}
+\usepackage{iftex}
+\ifXeTeX
+  % Under XeTeX the listings `literate` table below is bypassed for non-ASCII
+  % input, so the monospaced font itself must contain the Lean symbols.
+  \usepackage[no-math]{fontspec}
+  \setmonofont{DejaVuSansMono}[Extension=.ttf, UprightFont=*, BoldFont=*-Bold,
+    ItalicFont=*-Oblique, BoldItalicFont=*-BoldOblique, Scale=MatchLowercase]
+\fi
 \usepackage{microtype}
 \usepackage[margin=1.1in]{geometry}
 \usepackage[hyphens]{url}
@@ -30,7 +38,6 @@
 \newtheorem{definition}[theorem]{Definition}
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
-\newtheorem{observation}[theorem]{Observation}
 
 %------------------------------------------------------------------
 % Notation
@@ -119,9 +126,9 @@ true digit. To remove the dependence on that check, we formalize an explicit
 irrationality-measure bound at the denominators $16^k$: for every $k\ge1$ and
 every integer $p$,
 $\abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k$.
-From it we prove that for every $n\ge0$ and every
-$g\ge 569n+\floor{\log_{16}(n+1)}+1+\Bconst$ the certificate at guard depth
-$g$ returns $d_n$; a simpler sufficient condition is $g\ge 570n+\Bsimple$. We
+Our main theorem follows: for every $n\ge0$ and every guard depth
+$g\ge 570n+\Bsimple$ the certificate returns $d_n$; more precisely,
+$g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with $B=\Bconst$ suffices. We
 also prove a short chain of exact statements relating the run of $0$s or
 $\mathrm{F}$s after position~$n$, the distance from $16^n\pi$ to the nearest
 integer, and the least sufficient guard depth. All statements are for every
@@ -168,11 +175,12 @@ $\Eng=4K+2$, and returns $\floor{(\Sng\monus\Eng)/16^g}\bmod16$
   $2\Eng<16^g\dist_n$ the bracket collapses (Lemma~\ref{lem:dist}).
 \item A formal irrationality-measure bound at the denominators $16^k$ with
   exponent $570$ and an explicit constant (Theorem~\ref{thm:measure}).
-\item For every $n$, an explicit guard depth at which the certificate is
-  proved to return $d_n$ (Theorem~\ref{thm:main}).
+\item The main theorem: for every $n$ and every $g\ge570n+\Bsimple$ the
+  certificate is proved to return $d_n$, with the sharper threshold
+  $569n+\floor{\log_{16}(n+1)}+1+B$, $B=\Bconst$ (Theorem~\ref{thm:main}).
 \item Exact relations between the $0$/$\mathrm{F}$ run after position $n$,
-  the distance $\dist_n$ and the least sufficient guard depth, together with a
-  kernel-checked example showing that one natural converse fails
+  the distance $\dist_n$ and the least sufficient guard depth, and the
+  kernel-checked finite statement $\run(77)=0$, $\gap(78)=49$
   (Section~\ref{sec:structure}).
 \end{enumerate}
 
@@ -183,9 +191,11 @@ computed numerics, and the latter are not used in any proof.
 
 \subsection*{Status of the capped certificate}
 The development also contains an earlier certificate that searches only the
-guard depths $4,8,\dots,64$ and falls back to $68$. It is proved correct for
-$n\le 10000$ and proved incorrect on an explicit window near $2^{272}$; between
-these ranges it is neither proved correct nor proved incorrect.
+guard depths $4,8,\dots,64$ and falls back to $68$. It is proved incorrect on
+an explicit window near $2^{272}$. Kernel certificates for its correctness at
+$n\le 10000$ are written; their check is pending a heavy build (it is not part
+of the continuous-integration build), and correctness for $n\le2000$ is
+checked. The positions $10001\le n\le2^{272}-72$ are unchecked.
 Appendix~\ref{app:future} describes these results. They are not part of the
 main theorem.
 
@@ -391,19 +401,22 @@ depth that is sufficient for every $n$. Define
   g(n)=569n+\floor{\log_{16}(n+1)}+1+B,\qquad B=\Bconst .
 \]
 
-\begin{theorem}[\lean{bbp_digit_all_n_mu570b}]\label{thm:main}
-For every $n\in\N$, the guard agrees at depth $g(n)$, and
-\[
-  \floor{16^n\pi}=\lo(n,g(n)),\qquad \lo(n,g(n))\bmod16=d_n .
-\]
-Moreover the same holds at every depth $g\ge g(n)$
-(\lean{bbp_guard_mu570b_of_ge}).
+\begin{theorem}[main theorem; \lean{bbp_digit_all_n_fixed7b},
+  \lean{bbp_digit_all_n_mu570b}]\label{thm:main}
+\leavevmode
+\begin{enumerate}
+\item For all $n,g\in\N$ with $g\ge570n+\Bsimple$, the certificate at depth
+  $g$ returns $\floor{16^n\pi}$ and $d_n$.
+\item More precisely, for every $n\in\N$ the guard agrees at depth $g(n)$,
+  \[
+    \floor{16^n\pi}=\lo(n,g(n)),\qquad \lo(n,g(n))\bmod16=d_n ,
+  \]
+  and the same holds at every depth $g\ge g(n)$
+  (\lean{bbp_guard_mu570b_of_ge}).
+\end{enumerate}
+Since $\floor{\log_{16}(n+1)}+1\le n+1$, we have $g(n)\le570n+B+1$, so
+part~(1) follows from part~(2).
 \end{theorem}
-
-\begin{corollary}[\lean{bbp_digit_all_n_fixed7b}]\label{cor:simple}
-For all $n,g\in\N$ with $g\ge570n+\Bsimple$, the certificate at depth $g$
-returns $\floor{16^n\pi}$ and $d_n$.
-\end{corollary}
 
 \begin{lstlisting}
 theorem bbp_digit_all_n_mu570b (n : ℕ) :
@@ -429,7 +442,7 @@ integer. The constant is computed exactly in Lean:
 $\ell=\floor{\log_{16}\lceil4580\cdot2^{7182802}\rceil}+1=1795704$
 (\lean{guardLogL_570b}), since $4580\cdot2^{7182802}=18320\cdot16^{1795700}$,
 and $j=\ell+\floor{\log_{16}(2\ell)}+1=1795704+5+1=\Bconst$
-(\lean{guardLogConst_570b}). Corollary~\ref{cor:simple} follows from monotonicity in $g$ and
+(\lean{guardLogConst_570b}). Part~(1) follows from monotonicity in $g$ and
 $\floor{\log_{16}(n+1)}\le n$.
 \end{proof}
 
@@ -448,7 +461,7 @@ compares the proved guards with $\need(n)$ at a few positions. The column
 $\need(n)$ is \emph{computed numerics}, obtained with \texttt{mpmath} at
 precision $4n+400$ bits; it is not a Lean theorem and no result in this paper
 depends on it. The other columns are values of the formulas in
-Theorem~\ref{thm:main}, Corollary~\ref{cor:simple} and Remark~\ref{rem:658}.
+Theorem~\ref{thm:main} and Remark~\ref{rem:658}.
 
 \begin{table}[ht]
 \centering
@@ -457,7 +470,7 @@ The last column is computed numerics, not a Lean theorem.}
 \label{tab:guard}
 \begin{tabular}{@{}r r r r r@{}}
 \toprule
-$n$ & $g(n)$ (Thm.~\ref{thm:main}) & $570n+\Bsimple$ & exponent $658$ & $\need(n)$ (numerics)\\
+$n$ & $g(n)$ (Thm.~\ref{thm:main}(2)) & $570n+\Bsimple$ (Thm.~\ref{thm:main}(1)) & exponent $658$ & $\need(n)$ (numerics)\\
 \midrule
 $0$       & 1\,795\,711   & 1\,795\,711   & 430\,010      & 2\\
 $1$       & 1\,796\,280   & 1\,796\,281   & 430\,667      & 2\\
@@ -532,8 +545,7 @@ $\dist_n<16^{-L}$ and $\need(n)\ge L+c_n$.
 \end{corollary}
 
 So a long run forces a long gap before the next $1$, a small distance and a
-large need. The converse implication fails, and a single kernel-checked
-example shows it.
+large need. The following explicit finite statement is kernel-checked.
 
 \begin{proposition}[\lean{long_gap_short_run}]\label{prop:converse}
 $\run(77)=0$ and $\gap(78)=49$.
@@ -547,9 +559,9 @@ Theorem~\ref{thm:sound} turns these checks into statements about the true
 digits.
 \end{proof}
 
-Proposition~\ref{prop:converse} shows that a long gap between $1$s does not
-force a run of $0$s or $\mathrm{F}$s, a small $\dist_n$, or a large
-$\need(n)$. Supporting lemmas in the same file include the countdown
+By Proposition~\ref{prop:converse}, position $77$ has a gap of $49$ digits
+before the next $1$ and no run of $0$s or $\mathrm{F}$s, so, by
+Theorem~\ref{thm:distrun}, $\dist_{77}>1/16$. Supporting lemmas in the same file include the countdown
 identities \lean{piRun_succ}, \lean{piRun_add} and \lean{piGapSeq_countdown},
 the bound \lean{piRun_le_inter_one_gap}, and \lean{piRun_pos_cases}, which
 records that a nonempty $0$-run means $x_n$ lies just above an integer and an
@@ -562,50 +574,56 @@ The development uses Lean \lean{leanprover/lean4:v4.29.0-rc8} and Mathlib at
 commit \lean{816ff4582a01b10567d1d4ecb10be7c4ff92aab4}, as recorded in
 \lean{lake-manifest.json}. All proofs are in the namespace
 \lean{FinitistProved} unless another namespace is shown; the results of
-Section~\ref{sec:structure} are in \lean{FinitistProved.PiDigitStructure}.
+Section~\ref{sec:structure} are in \lean{FinitistProved.PiDigitStructure},
+except the definition \lean{piGapSeq}, which is in
+\lean{Thoughts/Proved/BBPDigitDefs.lean}.
 
 \subsection*{Axioms and decision procedures}
 For each theorem in Table~\ref{tab:names}, \mbox{\texttt{\#print axioms}} reports no
-axioms beyond \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
-(\lean{cert_78_127} uses only \lean{propext}); in particular there is no
-\lean{sorryAx}. Finite
+axioms beyond \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound};
+in particular there is no \lean{sorryAx}. The file
+\lean{Thoughts/Axioms.lean} runs \mbox{\texttt{\#print axioms}} on every theorem
+in the table that is in the default build, and the repository's
+continuous-integration job fails if any other axiom, any \lean{sorry}, or
+any \lean{native_decide} appears. The theorem of Appendix~\ref{app:future}
+for $n\le10000$ is audited separately by \lean{Thoughts/AxiomsHeavy.lean}
+after the heavy build. Finite
 computations are checked with \mbox{\texttt{decide +kernel}}, so they are evaluated by
 the kernel; \lean{native_decide}, which would add the compiler to the trusted
 base, is not used.
 
 \subsection*{Theorem names}
-Table~\ref{tab:names} lists the Lean name, the file and the commit for each
-numbered result. The results currently live on three branches of the
-development repository; Section~\ref{sec:snapshot} describes the single
-public snapshot that will replace these references.
+Table~\ref{tab:names} lists the Lean name and the file for each numbered
+result. All of them are on the \texttt{main} branch of the repository
+\texttt{metasecdev/math-proofs} (currently private) at commit
+\texttt{4a6b74c}, which contains only the BBP/$\pi$ development.
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Results and their Lean names. Commits: (a)~\texttt{2c596fe}
-(branch \texttt{research/sharpen-guard-2}); (b)~\texttt{881fc80} (branch
-\texttt{research/cap-bracket}); (c)~\texttt{7d37c5d} (branch
-\texttt{research/digit-structure}). Results marked (a) also exist at (b) and
-(c) and on \texttt{main} (\texttt{ad5468a}) unless marked ``only''. File paths are relative to \texttt{Thoughts/}.}
+\caption{Results and their Lean names in \texttt{metasecdev/math-proofs},
+branch \texttt{main}, commit \texttt{4a6b74c}. File paths are relative to
+\texttt{Thoughts/}. Theorem~\ref{thm:cap10000} is in the separate Lake
+library \texttt{BBPHeavyCerts}; its check is pending a heavy build.}
 \label{tab:names}
 \footnotesize
-\begin{tabular}{@{}>{\raggedright}p{0.10\textwidth} >{\raggedright}p{0.47\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
+\begin{tabular}{@{}>{\raggedright}p{0.12\textwidth} >{\raggedright}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.37\textwidth}@{}}
 \toprule
-Result & Lean name & File (commit)\\
+Result & Lean name & File\\
 \midrule
-Thm.~\ref{thm:bbp} & \lean{bbpSeries_eq_pi} & \lean{Proved/BBPPiIdentity.lean} (a)\\
-Thm.~\ref{thm:sound} & \lean{BBPGuardAgreesAt.floor_pi}, \lean{BBPGuardAgreesAt.digit_pi} & \lean{Proved/BBPExplicitGuard.lean} (a)\\
-Lem.~\ref{lem:dist} & \lean{guardAgreesAt_of_dist} & \lean{Research/BBPConditionalAllN.lean} (a)\\
-Thm.~\ref{thm:measure} & \lean{MahlerSharp7b.pi_pow16_measure7} & \lean{Research/MahlerSharp7b.lean} (a only)\\
-Thm.~\ref{thm:main} & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean} (a only)\\
-Cor.~\ref{cor:simple} & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean} (a only)\\
-Rem.~\ref{rem:658} & \lean{bbp_digit_all_n_mu658} & \lean{Research/BBPMu658.lean} (a)\\
-Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lean} (c only)\\
-Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file (c only)\\
-Thm.~\ref{thm:chain} & \lean{forced_chain}, \lean{long_run_forces} & same file (c only)\\
-Prop.~\ref{prop:converse} & \lean{long_gap_short_run}, \lean{cert_78_127} & same file (c only)\\
-Thm.~\ref{thm:cap10000} & \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional} & \lean{Proved/BBPDigitsUnconditionalExt10000.lean} (b only)\\
-Thm.~\ref{thm:capwrong} & \lean{not_BBPSpigotDigitCorrect_window'}, \lean{not_BBPSpigotDigitCorrect_window} & \lean{Research/BBPCapBracket.lean}, \lean{Research/BBPCapRefutation.lean} (b only)\\
+Thm.~\ref{thm:bbp} & \lean{bbpSeries_eq_pi} & \lean{Proved/BBPPiIdentity.lean}\\
+Thm.~\ref{thm:sound} & \lean{BBPGuardAgreesAt.floor_pi}, \lean{BBPGuardAgreesAt.digit_pi} & \lean{Proved/BBPExplicitGuard.lean}\\
+Lem.~\ref{lem:dist} & \lean{guardAgreesAt_of_dist} & \lean{Research/BBPConditionalAllN.lean}\\
+Thm.~\ref{thm:measure} & \lean{MahlerSharp7b.pi_pow16_measure7} & \lean{Research/MahlerSharp7b.lean}\\
+Thm.~\ref{thm:main}(1) & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean}\\
+Thm.~\ref{thm:main}(2) & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean}\\
+Rem.~\ref{rem:658} & \lean{bbp_digit_all_n_mu658} & \lean{Research/BBPMu658.lean}\\
+Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lean}\\
+Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file\\
+Thm.~\ref{thm:chain} & \lean{forced_chain}, \lean{long_run_forces} & same file\\
+Prop.~\ref{prop:converse} & \lean{long_gap_short_run}, \lean{cert_78_127} & same file\\
+Thm.~\ref{thm:cap10000} & \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional} & \lean{Proved/BBPDigitsUnconditionalExt10000.lean} (pending)\\
+Thm.~\ref{thm:capwrong} & \lean{not_BBPSpigotDigitCorrect_window'}, \lean{not_BBPSpigotDigitCorrect_window} & \lean{Research/BBPCapBracket.lean}, \lean{Research/BBPCapRefutation.lean}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -614,16 +632,21 @@ Thm.~\ref{thm:capwrong} & \lean{not_BBPSpigotDigitCorrect_window'}, \lean{not_BB
 The import closure of \lean{PiDigitStructure.lean} contains seven modules of
 the development (the BBP algebra, series, tail, guarded-certificate and
 identity files, a definitions file, and the file itself). The import closures
-of the main theorem and of the capped-certificate results currently also
-contain unrelated modules of the same repository; they are not used by the
-proofs, and the public snapshot removes them.
+of the main theorem and of the capped-certificate results contain only
+modules of the BBP/$\pi$ development (the certificate, the irrationality
+measure and the explicit Chebyshev bounds); the repository contains no
+unrelated modules.
 
-\subsection{Plan for the public snapshot}\label{sec:snapshot}
-Before publication the theorem references above will be replaced by a single
-public commit of a separate repository containing only the modules needed for
-Table~\ref{tab:names}, with the Mathlib revision fixed in the Lake
-configuration as well as in the manifest, Mathlib-style names, and a
-generated axiom report. Table~\ref{tab:names} will then cite that one commit.
+\subsection*{Repository}
+The repository \texttt{metasecdev/math-proofs} pins Mathlib in the Lake
+configuration as well as in \lean{lake-manifest.json}. Its continuous
+integration builds the default target, which contains every result in
+Table~\ref{tab:names} except Theorem~\ref{thm:cap10000}, and runs the axiom
+check described above. The heavy certificates for Theorem~\ref{thm:cap10000}
+need more memory than hosted runners provide and are built separately
+(\texttt{lake build BBPHeavyCerts}). Before publication we plan to tag a
+single public commit and to rename the cited theorems to Mathlib style, with
+deprecated aliases for the names used here.
 
 \section*{Acknowledgements}
 The author used AI assistants (Grok Bot) as tools for drafting Lean proofs,
@@ -647,16 +670,23 @@ what happens at the positions where no depth up to $64$ agrees.
 
 \subsection{What is proved}
 
-\begin{theorem}\label{thm:cap10000}
+\begin{theorem}[check pending a heavy build]\label{thm:cap10000}
 For every $n\le10000$ the capped certificate returns $d_n$.
 \end{theorem}
 
-In Lean this is \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional}. The
-proof uses a fast natural-number checker (\lean{BBPFastGuard.lean}), proved
-to agree with the guard test, and checks in the kernel, in blocks, that the
-guard agrees for each $n\le10000$ at the depth the search selects; it then
-applies Theorem~\ref{thm:sound}. The bound $10000$ reflects the cost of the check,
-not a mathematical limit.
+In Lean this is \lean{BBPSpigotDigitCorrect_of_le_10000_unconditional}, in
+the library \texttt{BBPHeavyCerts}. The proof uses a fast natural-number
+checker (\lean{BBPFastGuard.lean}), proved to agree with the guard test, and
+checks in the kernel, in blocks, that the guard agrees for each $n\le10000$
+at the depth the search selects; it then applies Theorem~\ref{thm:sound}.
+The bound $10000$ reflects the cost of the check, not a mathematical limit.
+
+This kernel check needs more than $10$\,GB of memory per Lean process, so it
+is not part of the continuous-integration build. Its check is pending a heavy
+build; we list Theorem~\ref{thm:cap10000} as pending until that build and the
+axiom audit \lean{Thoughts/AxiomsHeavy.lean} have passed. The same argument
+for $n\le2000$ (\lean{BBPSpigotDigitCorrect_of_le_2000_unconditional}) is
+checked in the default build.
 
 \begin{theorem}\label{thm:capwrong}
 For every $n$ with $2^{272}-71\le n$ and $5n+348\le14\cdot2^{272}$, the capped
@@ -668,8 +698,8 @@ In Lean these are \lean{not_BBPSpigotDigitCorrect_window'} (general window)
 and \lean{not_BBPSpigotDigitCorrect_window} (the interval
 $[2^{272},2^{273}]$).
 
-For the positions $10001\le n\le2^{272}-72$ neither correctness nor failure
-of the capped certificate is proved. We do not claim that it fails there.
+The positions $10001\le n\le2^{272}-72$ are unchecked: no Lean statement
+about the capped certificate at these positions is proved.
 
 \subsection{Mechanism}
 For $n\ge1$ the lower end of the bracket satisfies, at every depth~$g$,
@@ -684,9 +714,9 @@ $16^{68}\le K+2$, that is, $n\ge2^{272}-71$, the downward bias is at least one
 unit, while the upper condition $5K+3\le14\cdot16^{68}$ keeps $\lo$ within the
 next lower integer; together they force $\lo\bmod16\ne d_n$
 (\lean{lo_digit_ne_of_window}). Below $2^{272}-71$ the bias is smaller than
-one unit, and whether the capped digit is wrong depends on the actual digits
-of $\pi$ after position $n$ (roughly, on a run of about $68-\log_{16}n$ zeros
-or $\mathrm{F}$s). No argument in the development decides that.
+one unit, and whether the capped digit equals $d_n$ depends on the actual
+digits of $\pi$ after position $n$ (roughly, on a run of about
+$68-\log_{16}n$ zeros or $\mathrm{F}$s). These positions are unchecked.
 
 \subsection{Directions}
 \begin{enumerate}
@@ -698,32 +728,10 @@ or $\mathrm{F}$s). No argument in the development decides that.
   column of Table~\ref{tab:guard} could be turned into kernel-checked
   statements for explicit ranges, using Theorem~\ref{thm:needbounds} and the
   decidable check.
-\item \emph{Finite digit-pattern observations.} A separate computation on
-  $d_0,\dots,d_{100000}$, with positions $n\le99800$, found the patterns in
-  Observation~\ref{obs:finite}. These are finite observations, not theorems:
-  they are not proved in Lean, they say nothing about larger $n$, and several
-  similar patterns that held up to $n\approx21000$ failed before $n=99800$.
+\item \emph{The heavy certificates.} Complete the heavy build for
+  Theorem~\ref{thm:cap10000} and extend the kernel-checked range of the
+  capped certificate beyond $n=10000$.
 \end{enumerate}
-
-\begin{observation}[computed, finite range only]\label{obs:finite}
-On the stated ranges, with $\need$ computed exactly from rational
-arithmetic:
-\begin{enumerate}
-\item no hexadecimal digit occurs $5$ times in a row in $d_1,\dots,d_{100000}$;
-\item for $n\le99800$, there are never $4$ consecutive gaps of length at least
-  $32$ between successive $1$s, and never $3$ consecutive such gaps of length
-  at least $48$;
-\item $\need(n)\le10$ for every $n\le99800$, with equality only at
-  $n=20174$ and $n=79938$;
-\item every block of $810$ consecutive positions in $[1904,99800]$ contains an
-  $n$ with $\need(n)\ge7$, and every block of $549$ consecutive positions in
-  $[161,99800]$ contains an $n$ with $\need(n)\ge6$.
-\end{enumerate}
-Patterns that held for $n\le21000$ but not for $n\le99800$ include: the
-largest gap between successive $1$s grew from $102$ to $142$; the number of
-blocks of four equal digits grew from $3$ to $20$; and the least distance
-between successive runs of length $3$ dropped from $268$ to $32$.
-\end{observation}
 
 \bibliographystyle{amsplain}
 \bibliography{refs}

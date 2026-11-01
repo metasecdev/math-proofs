@@ -1,0 +1,53 @@
+name: Paper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "paper/**"
+      - ".github/workflows/paper.yml"
+  pull_request:
+    paths:
+      - "paper/**"
+      - ".github/workflows/paper.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: wtfjoke/setup-tectonic@v4
+        with:
+          tectonic-version: 0.17.0
+
+      - name: Build paper/main.tex
+        working-directory: paper
+        run: |
+          set -o pipefail
+          rm -f main.pdf
+          tectonic --keep-logs main.tex 2>&1 | tee tectonic.log
+          test -s main.pdf
+
+      - name: Check for missing glyphs and unresolved references
+        working-directory: paper
+        run: |
+          if grep -E "Missing character|undefined references|Reference .* undefined|Citation .* undefined|There were undefined" main.log tectonic.log; then
+            echo "::error::LaTeX build has missing glyphs or unresolved references"
+            exit 1
+          fi
+
+      - name: Upload PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-pdf
+          path: |
+            paper/main.pdf
+            paper/main.log
+            paper/tectonic.log
+          if-no-files-found: warn
