@@ -114,7 +114,7 @@
 \keywords{$\pi$, Bailey--Borwein--Plouffe formula, digit extraction,
   irrationality measure, Lean~4, Mathlib, formal verification}
 
-\date{31 October 2026. Draft, not submitted.}
+\date{1 November 2026}
 
 \begin{abstract}
 We describe a Lean~4 development, built on Mathlib, about the
@@ -126,10 +126,9 @@ true digit. To remove the dependence on that check, we formalize an explicit
 irrationality-measure bound at the denominators $16^k$: for every $k\ge1$ and
 every integer $p$,
 $\abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k$.
-Our main theorem has two co-equal parts: for every $n\ge0$ the certificate
-returns $d_n$ at every guard depth
-$g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with $B=\Bconst$, and at every
-guard depth $g\ge 570n+\Bsimple$. We
+Our main theorem shows that for every $n\ge0$ the certificate returns $d_n$
+at every guard depth $g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with
+$B=\Bconst$; a simplified linear form of the guard is also proved. We
 also prove a short chain of exact statements relating the run of $0$s or
 $\mathrm{F}$s after position~$n$, the distance from $16^n\pi$ to the nearest
 integer, and the least sufficient guard depth. All statements are for every
@@ -153,7 +152,7 @@ that the rounding error cannot change the digit being extracted. How many extra
 digits are enough depends on how close $16^n\pi$ is to an integer, which is a
 Diophantine question about $\pi$.
 
-This paper reports a Lean~4~\cite{Mathlib2020} development that makes the
+This paper reports a Lean~4~\cite{Lean4} development, built on\nMathlib~\cite{Mathlib2020}, that makes the
 guard explicit and proves it sufficient for every position. We use the
 following conventions throughout. For $n\in\N$ let
 \[
@@ -193,15 +192,10 @@ finite ranges of digits are labeled either as kernel-checked theorems or as
 computed numerics, and the latter are not used in any proof.
 
 \subsection*{Status of the capped certificate}
-The development also contains an earlier certificate that searches only the
-guard depths $4,8,\dots,64$ and falls back to $68$. It is proved incorrect on
-an explicit window near $2^{272}$. Kernel certificates for its correctness at
-$n\le 10000$ were checked by a local build on the author's MacBook Pro at
-commit \texttt{d8e418e} (GitHub's continuous-integration build does not
-build them), and correctness for $n\le2000$ is checked by continuous
-integration. The positions $10001\le n\le2^{272}-72$ are unchecked.
-Appendix~\ref{app:future} describes these results. They are not part of the
-main theorem.
+The development also contains an earlier capped certificate, which searches
+only a fixed set of guard depths; its checked ranges, the unchecked range and
+an explicit window where it is proved incorrect are described in
+Appendix~\ref{app:future}. It is not part of the main theorem.
 
 \section{Related work}\label{sec:related}
 
@@ -702,7 +696,7 @@ and no \lean{sorry}, and the axiom audit \lean{Thoughts/AxiomsHeavy.lean}
 reports only \lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}
 (report \texttt{reports/heavy-certs-2026-10-31.md}). The same argument
 for $n\le2000$ (\lean{BBPSpigotDigitCorrect_of_le_2000_unconditional}) is
-checked in the default build.
+checked in the default build, which continuous integration runs.
 
 \begin{theorem}\label{thm:capwrong}
 For every $n$ with $2^{272}-71\le n$ and $5n+348\le14\cdot2^{272}$, the capped
