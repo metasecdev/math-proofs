@@ -61,7 +61,7 @@ Names are unchanged from the source development (no renames yet).
 | Runs, distance and need (Sec. 7) | `PiDigitStructure.piDist_run`, `piNeed_bounds`, `forced_chain`, `long_run_forces` | `Thoughts/Research/PiDigitStructure.lean` |
 | `ρ(77) = 0` and `γ(78) = 49` (Sec. 7) | `PiDigitStructure.long_gap_short_run`, `cert_78_127` | `Thoughts/Research/PiDigitStructure.lean` |
 | Capped certificate returns a wrong digit for `2^272 − 71 ≤ n`, `5n + 348 ≤ 14·2^272` (Appendix A) | `not_BBPSpigotDigitCorrect_window'`, `not_BBPSpigotDigitCorrect_window` | `Thoughts/Research/BBPCapBracket.lean`, `Thoughts/Research/BBPCapRefutation.lean` |
-| Capped certificate correct for `n ≤ 10000` (Appendix A; **pending the heavy build**, not checked by CI) | `BBPSpigotDigitCorrect_of_le_10000_unconditional` | `Thoughts/Proved/BBPDigitsUnconditionalExt10000.lean` |
+| Capped certificate correct for `n ≤ 10000` (Appendix A; checked by a local build on the MacBookPro at `d8e418e`; GitHub CI does not build it, see `reports/heavy-certs-2026-10-31.md`) | `BBPSpigotDigitCorrect_of_le_10000_unconditional` | `Thoughts/Proved/BBPDigitsUnconditionalExt10000.lean` |
 | Capped certificate correct for `n ≤ 2000` (checked by CI) | `BBPSpigotDigitCorrect_of_le_2000_unconditional` | `Thoughts/Proved/BBPDigitsUnconditionalExt2000.lean` |
 
 Earlier, weaker versions of the main theorem remain in the tree (`MahlerPiMeasure`,
@@ -83,12 +83,15 @@ The toolchain is pinned in `lean-toolchain`. The Mathlib revision is pinned in
 The code was imported from the author's development repository; each import commit
 records the source repository and commit SHA.
 
-## Heavy certificates (not checked by CI)
+## Heavy certificates (not built by GitHub CI; checked locally)
 
 `lean_lib BBPHeavyCerts` (`BBPDigitsUnconditionalExt3099/5899/8299/10000` and the
 `BBPFastCerts*` modules) holds the kernel certificates for the capped digit checks up to
 n ≤ 10000. It is **not** a default target, and **CI does not build or check it**: each Lean
-process needs more than 10 GB of RAM. Build it explicitly on a large machine, then audit its axioms:
+process needs more than 10 GB of RAM (up to about 16 GB). It was built and axiom-checked locally on
+the MacBookPro at commit `d8e418e` (2026-10-31): 0 errors, no `sorry`, and every theorem uses only
+`propext`, `Classical.choice`, `Quot.sound`; see `reports/heavy-certs-2026-10-31.md`.
+To reproduce, build it explicitly on a large machine, then audit its axioms:
 
 ```
 lake build BBPHeavyCerts
