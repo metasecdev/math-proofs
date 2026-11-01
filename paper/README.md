@@ -34,7 +34,8 @@ Table 2 of the paper cites commit `4a6b74c`, using paths relative to `Thoughts/`
 `leanprover/lean4:v4.29.0-rc8`, with Mathlib `816ff4582a01b10567d1d4ecb10be7c4ff92aab4` pinned
 in both `lakefile.lean` and `lake-manifest.json`.
 
-- Main theorem (B = 1 795 710, or the simpler form `g ≥ 570n + 1795711`):
+- Main theorem, two co-equal forms (sharp: `g ≥ 569n + ⌊log₁₆(n+1)⌋ + 1 + 1795710`;
+  simplified: `g ≥ 570n + 1795711`):
   `Thoughts/Research/BBPMu570b.lean`. The irrationality measure is in
   `Thoughts/Research/MahlerSharp7b.lean`.
 - Runs, distance and need (Section 7): `Thoughts/Research/PiDigitStructure.lean`.

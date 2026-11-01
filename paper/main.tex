@@ -126,9 +126,10 @@ true digit. To remove the dependence on that check, we formalize an explicit
 irrationality-measure bound at the denominators $16^k$: for every $k\ge1$ and
 every integer $p$,
 $\abs{16^k\pi-p}\cdot16^{570k}>2^{-7182802}\cdot16^k$.
-Our main theorem follows: for every $n\ge0$ and every guard depth
-$g\ge 570n+\Bsimple$ the certificate returns $d_n$; more precisely,
-$g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with $B=\Bconst$ suffices. We
+Our main theorem has two co-equal parts: for every $n\ge0$ the certificate
+returns $d_n$ at every guard depth
+$g\ge 569n+\floor{\log_{16}(n+1)}+1+B$ with $B=\Bconst$, and at every
+guard depth $g\ge 570n+\Bsimple$. We
 also prove a short chain of exact statements relating the run of $0$s or
 $\mathrm{F}$s after position~$n$, the distance from $16^n\pi$ to the nearest
 integer, and the least sufficient guard depth. All statements are for every
@@ -175,9 +176,11 @@ $\Eng=4K+2$, and returns $\floor{(\Sng\monus\Eng)/16^g}\bmod16$
   $2\Eng<16^g\dist_n$ the bracket collapses (Lemma~\ref{lem:dist}).
 \item A formal irrationality-measure bound at the denominators $16^k$ with
   exponent $570$ and an explicit constant (Theorem~\ref{thm:measure}).
-\item The main theorem: for every $n$ and every $g\ge570n+\Bsimple$ the
-  certificate is proved to return $d_n$, with the sharper threshold
-  $569n+\floor{\log_{16}(n+1)}+1+B$, $B=\Bconst$ (Theorem~\ref{thm:main}).
+\item The main theorem, with two co-equal guards: for every $n$ the
+  certificate is proved to return $d_n$ at every depth
+  $g\ge569n+\floor{\log_{16}(n+1)}+1+B$, $B=\Bconst$ (sharp form), and at
+  every depth $g\ge570n+\Bsimple$ (simplified form)
+  (Theorem~\ref{thm:main}).
 \item Exact relations between the $0$/$\mathrm{F}$ run after position $n$,
   the distance $\dist_n$ and the least sufficient guard depth, and the
   kernel-checked finite statement $\run(77)=0$, $\gap(78)=49$
@@ -402,22 +405,24 @@ depth that is sufficient for every $n$. Define
   g(n)=569n+\floor{\log_{16}(n+1)}+1+B,\qquad B=\Bconst .
 \]
 
-\begin{theorem}[main theorem; \lean{bbp_digit_all_n_fixed7b},
-  \lean{bbp_digit_all_n_mu570b}]\label{thm:main}
+\begin{theorem}[main theorem; \lean{bbp_digit_all_n_mu570b},
+  \lean{bbp_digit_all_n_fixed7b}]\label{thm:main}
 \leavevmode
 \begin{enumerate}
-\item For all $n,g\in\N$ with $g\ge570n+\Bsimple$, the certificate at depth
-  $g$ returns $\floor{16^n\pi}$ and $d_n$.
-\item More precisely, for every $n\in\N$ the guard agrees at depth $g(n)$,
+\item \emph{Sharp form.} For every $n\in\N$ the guard agrees at depth
   \[
-    \floor{16^n\pi}=\lo(n,g(n)),\qquad \lo(n,g(n))\bmod16=d_n ,
+    g(n)=569n+\floor{\log_{16}(n+1)}+1+\Bconst ,
   \]
-  and the same holds at every depth $g\ge g(n)$
-  (\lean{bbp_guard_mu570b_of_ge}).
+  so $\floor{16^n\pi}=\lo(n,g(n))$ and $\lo(n,g(n))\bmod16=d_n$; the same
+  holds at every depth $g\ge g(n)$ (\lean{bbp_guard_mu570b_of_ge}).
+\item \emph{Simplified form.} For all $n,g\in\N$ with $g\ge570n+\Bsimple$,
+  the certificate at depth $g$ returns $\floor{16^n\pi}$ and $d_n$.
 \end{enumerate}
-Since $\floor{\log_{16}(n+1)}+1\le n+1$, we have $g(n)\le570n+B+1$, so
-part~(1) follows from part~(2).
 \end{theorem}
+
+Both parts are proved in Lean as separate theorems. Part~(1) gives the
+smaller depth; part~(2) has a simpler formula. Since
+$\floor{\log_{16}(n+1)}+1\le n+1$, we have $g(n)\le570n+\Bsimple$.
 
 \begin{lstlisting}
 theorem bbp_digit_all_n_mu570b (n : ℕ) :
@@ -443,8 +448,8 @@ integer. The constant is computed exactly in Lean:
 $\ell=\floor{\log_{16}\lceil4580\cdot2^{7182802}\rceil}+1=1795704$
 (\lean{guardLogL_570b}), since $4580\cdot2^{7182802}=18320\cdot16^{1795700}$,
 and $j=\ell+\floor{\log_{16}(2\ell)}+1=1795704+5+1=\Bconst$
-(\lean{guardLogConst_570b}). Part~(1) follows from monotonicity in $g$ and
-$\floor{\log_{16}(n+1)}\le n$.
+(\lean{guardLogConst_570b}). Part~(2) follows from part~(1), monotonicity
+in $g$ and $\floor{\log_{16}(n+1)}\le n$.
 \end{proof}
 
 \begin{remark}[the exponent-$658$ guard]\label{rem:658}
@@ -471,7 +476,7 @@ The last column is computed numerics, not a Lean theorem.}
 \label{tab:guard}
 \begin{tabular}{@{}r r r r r@{}}
 \toprule
-$n$ & $g(n)$ (Thm.~\ref{thm:main}(2)) & $570n+\Bsimple$ (Thm.~\ref{thm:main}(1)) & exponent $658$ & $\need(n)$ (numerics)\\
+$n$ & $g(n)$ (Thm.~\ref{thm:main}(1)) & $570n+\Bsimple$ (Thm.~\ref{thm:main}(2)) & exponent $658$ & $\need(n)$ (numerics)\\
 \midrule
 $0$       & 1\,795\,711   & 1\,795\,711   & 430\,010      & 2\\
 $1$       & 1\,796\,280   & 1\,796\,281   & 430\,667      & 2\\
@@ -618,8 +623,8 @@ Thm.~\ref{thm:bbp} & \lean{bbpSeries_eq_pi} & \lean{Proved/BBPPiIdentity.lean}\\
 Thm.~\ref{thm:sound} & \lean{BBPGuardAgreesAt.floor_pi}, \lean{BBPGuardAgreesAt.digit_pi} & \lean{Proved/BBPExplicitGuard.lean}\\
 Lem.~\ref{lem:dist} & \lean{guardAgreesAt_of_dist} & \lean{Research/BBPConditionalAllN.lean}\\
 Thm.~\ref{thm:measure} & \lean{MahlerSharp7b.pi_pow16_measure7} & \lean{Research/MahlerSharp7b.lean}\\
-Thm.~\ref{thm:main}(1) & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean}\\
-Thm.~\ref{thm:main}(2) & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean}\\
+Thm.~\ref{thm:main}(1) & \lean{bbp_digit_all_n_mu570b}, \lean{bbp_guard_mu570b_of_ge} & \lean{Research/BBPMu570b.lean}\\
+Thm.~\ref{thm:main}(2) & \lean{bbp_digit_all_n_fixed7b} & \lean{Research/BBPMu570b.lean}\\
 Rem.~\ref{rem:658} & \lean{bbp_digit_all_n_mu658} & \lean{Research/BBPMu658.lean}\\
 Thm.~\ref{thm:distrun} & \lean{piDist_run} & \lean{Research/PiDigitStructure.lean}\\
 Thm.~\ref{thm:needbounds} & \lean{piNeed_bounds} & same file\\
