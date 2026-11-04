@@ -17,7 +17,9 @@ permissions:
 
 jobs:
   latex:
-    runs-on: ubuntu-latest
+    # Same-repo pushes/PRs use Brian's self-hosted runner; fork PRs stay on GitHub-hosted
+    # so outside code never runs on the bedroom PC (this repo is public).
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","linux","x64","bedroom-pc"]') || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v5
 

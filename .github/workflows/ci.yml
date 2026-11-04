@@ -11,12 +11,18 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Same-repo pushes/PRs use Brian's self-hosted runner; fork PRs stay on GitHub-hosted
+    # so outside code never runs on the bedroom PC (this repo is public).
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","linux","x64","bedroom-pc"]') || 'ubuntu-latest' }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
 
-      - name: Free runner disk space
+      - name: Show disk space
+        run: df -h .
+
+      - name: Free runner disk space (GitHub-hosted only)
+        if: runner.environment == 'github-hosted'
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
           df -h /
