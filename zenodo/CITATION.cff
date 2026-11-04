@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "A formally verified hexadecimal digit extraction for pi with an explicit guard for every position (Lean 4 development)"
+authors:
+  - family-names: Taylor
+    given-names: Brian Bernard
+version: "1.0.1"
+# date-released: fill in on release day (YYYY-MM-DD)
+date-released: "2026-11-XX"
+# DECISION NEEDED: the repo has no code LICENSE yet. Apache-2.0 matches Mathlib; change if Brian picks another.
+license: Apache-2.0
+repository-code: "https://github.com/metasecdev/math-proofs"
+# After Zenodo mints the DOI, add the concept DOI here:
+# doi: "10.5281/zenodo.XXXXXXX"
+keywords:
+  - pi
+  - BBP formula
+  - digit extraction
+  - irrationality measure
+  - Lean 4
+  - Mathlib
+  - formal verification
+abstract: >-
+  Lean 4 / Mathlib development, checked with only the axioms propext, Classical.choice
+  and Quot.sound (no sorry, no native_decide). It proves that pi equals the
+  Bailey-Borwein-Plouffe series; that a guarded natural-number certificate [lo, hi],
+  whenever lo = hi, returns floor(16^n * pi) and hence the n-th hexadecimal digit of pi;
+  an explicit irrationality-measure bound for pi at the denominators 16^k
+  (|16^k pi - p| * 16^(570k) > 2^-7182802 * 16^k for all integers p and k >= 1); and, as
+  a consequence, that every guard depth g >= 569n + floor(log16(n+1)) + 1 + 1795710,
+  in particular every g >= 570n + 1795711, returns the correct digit at position n, for
+  every n. It also contains kernel-checked results on runs, distances and the guard depth
+  needed at individual positions, and an analysis of a capped certificate: correct for
+  n <= 2000 (checked in CI) and n <= 10000 (separate heavy library, checked by a local
+  build), and provably wrong on an explicit window of positions near 2^272; positions
+  between these ranges are unchecked for the capped certificate.
+# Uncomment once the arXiv paper exists:
+# preferred-citation:
+#   type: article
+#   title: "<paper title>"
+#   authors:
+#     - family-names: Taylor
+#       given-names: Brian Bernard
+#   identifiers:
+#     - type: other
+#       value: "arXiv:XXXX.XXXXX"

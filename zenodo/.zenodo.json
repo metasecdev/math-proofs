@@ -1,0 +1,29 @@
+{
+  "title": "A formally verified hexadecimal digit extraction for pi with an explicit guard for every position (Lean 4 development)",
+  "upload_type": "software",
+  "creators": [
+    { "name": "Taylor, Brian Bernard" }
+  ],
+  "license": "Apache-2.0",
+  "access_right": "open",
+  "version": "1.0.1",
+  "language": "eng",
+  "keywords": [
+    "pi",
+    "BBP formula",
+    "digit extraction",
+    "irrationality measure",
+    "Lean 4",
+    "Mathlib",
+    "formal verification"
+  ],
+  "description": "<p>Lean 4 / Mathlib development accompanying the paper by Brian Bernard Taylor. Toolchain leanprover/lean4:v4.29.0-rc8; Mathlib pinned at 816ff4582a01b10567d1d4ecb10be7c4ff92aab4. Every headline theorem uses only the axioms propext, Classical.choice and Quot.sound; there is no sorry and no native_decide (certificates are checked with decide +kernel).</p><p>Proved results:</p><ul><li>pi equals the Bailey&ndash;Borwein&ndash;Plouffe series (bbpSeries_eq_pi).</li><li>Soundness of a guarded natural-number certificate [lo, hi]: whenever lo = hi, the common value is floor(16^n &middot; pi), so its residue mod 16 is the n-th hexadecimal digit of pi.</li><li>An explicit irrationality-measure bound at the denominators 16^k: |16^k pi &minus; p| &middot; 16^(570k) &gt; 2^&minus;7182802 &middot; 16^k for all integers p and all k &ge; 1.</li><li>For every position n, every guard depth g &ge; 569n + floor(log16(n+1)) + 1 + 1795710, and in particular every g &ge; 570n + 1795711, returns the correct digit (namespace BBPPi).</li><li>Kernel-checked facts about runs, distances and the guard depth needed at individual positions.</li><li>A capped certificate is correct for n &le; 2000 (checked in CI) and n &le; 10000 (non-default library BBPHeavyCerts, checked by a local build), and is provably wrong on an explicit window of positions near 2^272. Positions between these ranges are unchecked for the capped certificate.</li></ul><p>Build: lake exe cache get &amp;&amp; lake build.</p>",
+  "related_identifiers": [
+    {
+      "identifier": "arXiv:XXXX.XXXXX",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint",
+      "scheme": "arxiv"
+    }
+  ]
+}
