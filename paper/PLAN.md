@@ -15,6 +15,16 @@ private until Brian decides otherwise.
 | 7. CI axiom report | Done for the default build (`Thoughts/Axioms.lean`, `axioms-report` artifact). The heavy `n ≤ 10000` certificates are not built by GitHub CI; they were checked by a local build on the MacBookPro at `d8e418e` (`Thoughts/AxiomsHeavy.lean`, `reports/heavy-certs-2026-10-31.md`) |
 | 8. README | Done: root `README.md`, with a theorem table |
 
+## arXiv submission status
+
+The paper is planned for arXiv math.NT, cross-listed to cs.LO. The submission is waiting for an
+arXiv endorsement in math, which is required for a first submission.
+
+- **13 November 2026:** David H. Bailey declined to endorse, because he does not submit to arXiv
+  himself and so cannot endorse others. Wadim Zudilin, asked on 1 November 2026, has not replied.
+  Brian Bernard Taylor will choose the next person to ask. Requests go to one person at a time,
+  following arXiv's endorsement guidance.
+
 The original plan follows.
 
 1. **New repository or folder.** Create a fresh repository (e.g. `bbp-pi-lean`) that holds only
